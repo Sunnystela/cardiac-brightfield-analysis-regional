@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cardiac-brightfield-standalone"
+version = "0.1.0"
+description = "Standalone, GUI-ready packaging of the P36/Conv bright-field cardiac organoid analysis engine (verbatim copy) with adapters"
+# The engine ran on CPython 3.11.16; other minor versions are untested.
+requires-python = ">=3.11,<3.12"
+# Exact versions of the environment that produced the validated P36/Conv runs (see docs/DEPENDENCIES.md).
+# Exact pins matter: Farneback flow and float summaries can change across OpenCV / NumPy versions.
+dependencies = [
+    "numpy==2.4.6",
+    "opencv-python-headless==5.0.0.93",
+    "scipy==1.17.1",
+    "scikit-learn==1.9.1",
+    "matplotlib==3.11.1",
+    "PyYAML==6.0.3",
+    "torch==2.14.0",   # import-only (segmentation/sam2_segmenter.py imports it at module level); CPU build is enough
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1"]
+
+[tool.setuptools]
+# Not an installable library: launch.py runs from this folder, and the engine locates configs/ and src/
+# relative to engine_scripts/ (original REPO_ROOT convention). `pip install -e .` installs dependencies only.
+packages = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p no:cacheprovider"

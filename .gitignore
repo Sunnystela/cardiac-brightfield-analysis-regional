@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.vs/
+bin/
+obj/
+tests/_work/
+validation/results/pixel_first_rederive/
+validation/.run_marker
+validation/results/

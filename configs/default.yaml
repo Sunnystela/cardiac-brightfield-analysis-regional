@@ -1,0 +1,461 @@
+acquisition:
+  # Nominal acquisition-software setting, per user report (30 fps target,
+  # 30 s target session length). Recorded here as a separate fact, NOT as
+  # the timebase to use for analysis -- the sample AVIs' own embedded
+  # frame rate differs from this per file (each ~22-23 fps, all distinct).
+  # See results/frame_rate_diagnostic/frame_rate_diagnostic.json and
+  # scripts/diagnose_frame_rate.py for the full cross-tool comparison, and
+  # docs/experimental_design.md #18 for the finding this decision is based on.
+  nominal_fps: 30.0
+  nominal_duration_s: 30.0
+
+  # DECISION (current sample set): use each file's own measured frame rate
+  # (OpenCV CAP_PROP_FPS, confirmed to exactly match ffprobe's
+  # r_frame_rate/avg_frame_rate -- not a parsing bug) as the timebase for
+  # motion/functional analysis, rather than nominal_fps above. All existing
+  # motion scripts already read fps per-file via cv2.CAP_PROP_FPS, so this
+  # requires no code change -- recorded here so the choice is explicit and
+  # not just an implicit side effect of how the code happens to work.
+  # Going forward: new acquisition sessions should lock the capture
+  # pipeline to a fixed, verified frame rate (confirmed via ffprobe/OpenCV
+  # on a test recording) so this reconstruction is not needed per file.
+  timebase_policy: per_file_measured_fps
+
+segmentation:
+  sam2:
+    checkpoint_path: checkpoints/sam2/sam2.1_hiera_small.pt
+    # Hydra config name registered inside the installed sam2 package
+    # (resolved by sam2's own config search path, not a file in this repo).
+    model_cfg: configs/sam2.1/sam2.1_hiera_s.yaml
+    # "auto" picks CUDA when available, otherwise CPU. Never hard-code cuda/cpu here.
+    device: auto
+    multimask_output: true
+
+  provisional_primary:
+    # Empirical convention observed across the initial sample videos: the
+    # Strategy-A (single center point) candidate at this index consistently
+    # matched the compact organoid body. This is NOT a guaranteed SAM2 API
+    # contract -- re-validate via provisional_primary_qc as more videos are
+    # processed, and revisit this value (or replace it with a real
+    # selection rule) if QC flags start showing "review_needed".
+    candidate_index: 1
+    # QC threshold: the provisional candidate's largest connected component
+    # must cover at least this fraction of its own mask area to count as a
+    # single dominant blob (structural sanity, not a shape/morphology metric).
+    min_dominant_component_fraction: 0.9
+
+morphology:
+  # No pixel-to-micron calibration is available yet (io/metadata.py parsing
+  # is not implemented). Leave null -- compute_morphology_features then
+  # reports pixel-only measurements rather than fabricating physical units.
+  pixel_size_um: null
+  # Number of angular samples used for the radial-irregularity profile
+  # (docs/analysis_design.md #5, "Radial Irregularity").
+  num_radial_angles: 360
+
+# Motion analysis interface (see src/cardio_organoid/motion/). Motion
+# analysis is deliberately decoupled from precise segmentation for ROI
+# *construction*: it only reads the morphology mask's centroid + bounding
+# box (never its exact contour) to build a coarse rectangular ROI, and
+# optical flow is always computed over that whole ROI. Whether the mask is
+# additionally used to *gate* which ROI pixels count toward the waveform
+# average is a separate, explicitly compared question -- see
+# signal_extraction below and scripts/compare_motion_signal_extraction.py.
+motion:
+  roi:
+    # Pixels added on each side of the morphology mask's bounding box to
+    # build the (coarse, rectangular) motion ROI. Unvalidated placeholder.
+    # Raised from 60 -> 400 so screened background patches (see
+    # signal_extraction.background_patches below) have enough room outside
+    # the organoid/debris ring to actually fit inside the ROI. Empirically
+    # tuned by inspecting background_patches_qc.png: at 60px, radius_ratio
+    # 0.9 left zero valid patch positions (all fell outside the ROI crop);
+    # at 200px, radius_ratio 0.55-0.65 placed all 8 candidates *inside* the
+    # peripheral debris ring rather than past it (visually confirmed via
+    # the QC image), so the brightness/variability screen had nothing
+    # clean to select from. 400px + radius_ratio 0.65 (below) visually
+    # lands the kept patches on clean dish background outside the debris.
+    expansion_px: 400
+  optical_flow:
+    # DECISION (validated, rounds 4-5): Farneback is the primary method for
+    # this project's motion pipeline. RAFT's preprocessing/scale-correction
+    # was verified correct (synthetic known-shift test, <0.1px error), but
+    # RAFT shows a texture-dependent flow artifact on this bright-field
+    # organoid interior (identical-frame "flow" with a mean of tens of px
+    # at native resolution; even after the resize fix, its boundary-region
+    # identical-frame noise floor is comparable to real detected boundary
+    # motion amplitude, and its forward-backward consistency is 30-270x
+    # worse than Farneback's at the boundary -- see
+    # results/phase2_raft_validation/summary.json). RAFT is kept as a
+    # documented comparison baseline (raft_backend.py,
+    # scripts/compare_raft_vs_farneback_spatial.py,
+    # scripts/validate_raft_reliability.py), not used by the main pipeline.
+    method: opencv_farneback
+  drift_correction:
+    # Strategy for separating global translation (plate/stage/camera) from
+    # true contractile deformation before computing radial motion.
+    # "median_of_roi": subtract the ROI's median flow vector per frame pair
+    # (see radial_flow.remove_global_drift) -- documented heuristic, not
+    # validated against ground truth.
+    method: median_of_roi
+  raft:
+    # Round 4: RAFT vs Farneback comparison, same frame pairs/patches --
+    # see raft_backend.py and scripts/compare_raft_vs_farneback_spatial.py.
+    # Pretrained torchvision weights, downloaded to the torch hub cache
+    # (~/.cache/torch/hub/checkpoints/), not this repo.
+    weights_variant: C_T_SKHT_V2
+    # RAFT breaks down (garbage flow, confirmed on identical-frame pairs)
+    # at this project's native ROI resolution -- inference runs on the
+    # crop downscaled so its long side is this many pixels, then the flow
+    # field is rescaled back up. See raft_backend.py's module docstring.
+    target_long_side_px: 768
+  signal_extraction:
+    # Phase 2 signal-extraction comparison (frame step, spatial gating) --
+    # see scripts/compare_motion_signal_extraction.py. Not a finalized
+    # pipeline setting; this script reports which combination looks most
+    # stable rather than the config silently picking one.
+    frame_steps_to_compare: [1, 2, 3, 4, 5]
+    buffer_duration_s: 7.0
+    # Dilation margin (pixels) for the "dilated_mask" spatial-gate arm.
+    gate_dilation_px: 30
+    boundary_band:
+      # "boundary_band" spatial-gate arm: a band straddling the morphology
+      # mask's contour, inward and outward margins expressed as ratios of
+      # the organoid's own equivalent diameter (never fixed pixels), so it
+      # scales across organoids of different sizes. Motivated by observing
+      # optical-flow signal concentrated near the boundary rather than the
+      # (optically uniform) interior -- see spatial_gate.boundary_band_mask.
+      inner_ratio: 0.05
+      outer_ratio: 0.05
+    background_patches:
+      # Multi-patch static-background reference (replaces a single region
+      # outside a dilated mask) -- see background_reference.py. Patch
+      # placement radius and size are ratios of equivalent diameter;
+      # screening (bright + temporally static) is self-relative
+      # (percentile-based among the candidates), not an absolute threshold.
+      n_angles: 8
+      radius_ratio: 0.65
+      patch_size_ratio: 0.04
+
+  spatial_patches:
+    # Spatially resolved motion analysis (round 3): tiles a coarse organoid
+    # region (the dilated morphology mask) into a grid instead of averaging
+    # radial motion over the whole organoid, because early-stage beating
+    # can be localized to part of the organoid rather than synchronized --
+    # see spatial_patches.py and scripts/analyze_spatial_motion_patches.py.
+    # Cell size is a ratio of equivalent diameter, never fixed pixels.
+    cell_size_ratio: 0.12
+    # A grid cell must overlap the analysis region by at least this
+    # fraction of its own area to be analyzed at all.
+    min_coverage_fraction: 0.3
+    # Frame step used for per-patch waveforms. Reuses the step most videos
+    # settled on during the round-2 signal-extraction sweep
+    # (results/phase2_signal_extraction_v2/*/signal_extraction_qc_v2.json:
+    # chosen_step) rather than re-sweeping steps here -- this script's
+    # focus is the spatial dimension, not step selection.
+    frame_step: 3
+    # A patch counts as "active" if its radial-waveform std is at or above
+    # this percentile among all analyzed patches in that video (self-
+    # relative, not an absolute magic threshold).
+    active_percentile: 75.0
+    # How many of the most active patches get their own waveform plot.
+    top_n_active_to_plot: 5
+
+  pipeline:
+    # Main functional motion pipeline (Farneback, full-video, per-patch ->
+    # active regions) -- see src/cardio_organoid/pipeline/analyze.py and
+    # scripts/analyze_video.py. Never uses a single whole-organoid averaged
+    # waveform as the primary signal (per-patch/per-region only), since the
+    # current sample videos show localized, not whole-organoid, beating.
+    # Number of contiguous windows each patch's full-video waveform is
+    # split into for temporal_persistence_fraction (windowed_std).
+    n_windows: 10
+    # A window counts as "elevated" if its std is at least this multiple
+    # of the patch's own quietest window (self-relative, not absolute).
+    persistence_ratio_threshold: 1.5
+    # DECISION (round 6): active-patch classification no longer uses
+    # spatial_patches.classify_active_patches' percentile rule -- on the
+    # sample set it mechanically selected ~100-active_percentile% of
+    # whatever candidates existed every single time (~17-18 of ~68-71
+    # patches, i.e. exactly ~25%, in all 9 videos), which is a property of
+    # the rule, not a finding about activity. See activity_significance.py.
+    #
+    # DECISION (round 7, correcting round 6): round 6 also tested
+    # temporal_persistence_fraction against the same background/no-motion
+    # reference -- but persistence is a property this project expects real
+    # localized beating to have, not something a background/no-motion
+    # region can validly stand in for testing. There is no genuine non-
+    # beating organoid sample in this pilot set, and none should be
+    # assumed to exist. A patch is now active only if:
+    #   (a) its full-video radial-waveform std exceeds a statistical
+    #       threshold (null_mean + z * null_std) from an independently
+    #       measured, size-matched background/no-motion reference, AND
+    #   (b) its periodicity is significant against a temporal-shuffle
+    #       permutation null built from the patch's own waveform (no
+    #       external "non-beating" reference needed or assumed).
+    # temporal_persistence_fraction and neighbor_coherence are still
+    # computed and saved/visualized for every patch, but are not additional
+    # hard gates -- see analyze.py's module docstring for why stacking more
+    # independent significance tests would bias toward finding nothing
+    # regardless of true activity. This can legitimately select zero, some,
+    # or (in principle) all patches; not fixed in advance.
+    active_z_threshold: 3.0
+    # Periodicity significance (surrogate-data permutation test, see
+    # diagnostics.periodicity_shuffle_test). All three null-generation
+    # methods are computed for every patch so their permissiveness can be
+    # compared (round 7 found full_shuffle flagging up to 70/70 patches in
+    # one video -- implausible, and likely too permissive for waveforms
+    # with short-range smoothness unrelated to true periodicity).
+    periodicity_n_shuffles: 200
+    periodicity_max_lag: 100
+    periodicity_p_value_threshold: 0.05
+    periodicity_null_methods: [full_shuffle, block_shuffle, phase_randomized]
+    # Block size (samples) for the block_shuffle null.
+    periodicity_block_size: 5
+    # Which null method's result feeds the single (still-exploratory, see
+    # above) active_by_periodicity set and periodicity_z normalized score
+    # used for the one exploratory QC overlay/heatmap this pipeline
+    # generates. ALL THREE methods are still computed and reported in full
+    # for every patch (periodicity_null_method_comparison,
+    # periodicity_by_null_method) -- this setting only picks which one
+    # happens to drive that one overlay, since only one can be drawn.
+    #
+    # phase_randomized is set here because it is the theoretically
+    # strictest of the three (preserves the *entire* power spectrum /
+    # autocorrelation function exactly, not just short-range structure --
+    # the standard surrogate-data method, Theiler et al. 1992) and was
+    # markedly more conservative than the other two on every one of the 9
+    # sample videos (round 8 check). This is EXPLORATORY, NOT a validated
+    # or finalized choice -- do not treat phase_randomized as "the"
+    # periodicity null method until manual-reference AUC comparison
+    # (reference_comparison.py, scripts/evaluate_scores_against_reference.py)
+    # actually decides which null method (if any of these three) best
+    # reproduces visually-observed beating.
+    periodicity_primary_null_method: phase_randomized  # EXPLORATORY candidate only -- not confirmed
+    null_reference:
+      # Background/no-motion reference cells, analyzed with the identical
+      # pipeline (same full-video streaming, same activity-score
+      # functions) as the organoid grid patches. patch_size_ratio is
+      # deliberately NOT independent of spatial_patches.cell_size_ratio --
+      # it must match, or the noise-floor comparison isn't apples-to-apples
+      # (a smaller averaging region has different std statistics purely
+      # from size, not real signal). See analyze.py.
+      #
+      # DECISION (round 14): a single ring of n_angles candidates left as
+      # few as 2-4 surviving background patches on real data -- too few
+      # for a stable organoid-vs-background correlation baseline (see
+      # scripts/diagnose_synchronization_baseline_artifact.py /
+      # compare_early_vs_mature_synchronization.py). background_reference.
+      # select_background_patches_multi_ring now samples radius_ratios x
+      # n_angles candidates (still all screened self-relatively, never an
+      # absolute magic threshold) and explicitly excludes any candidate
+      # overlapping the dilated organoid mask, plus a local per-pixel
+      # texture-movement check the single-ring version didn't have.
+      # radius_ratio (singular) is kept only as the historical reference
+      # point this range is centered on -- not read by the pipeline
+      # anymore.
+      n_angles: 16
+      radius_ratio: 0.65  # historical reference only, not used by select_background_patches_multi_ring
+      radius_ratios: [0.55, 0.60, 0.65, 0.70, 0.75]
+      # Target, not a hard requirement: fewer surviving patches than this
+      # is recorded with a low_confidence_background_reference QC flag
+      # rather than silently treated as equally reliable (CLAUDE.md #11).
+      min_target_patches: 8
+    # A region with fewer patches than this is reported separately as
+    # possible single-patch-noise fragmentation, not silently dropped or
+    # silently kept -- both the full region list and the
+    # >= min_region_patches-filtered view are saved so a human can compare.
+    min_region_patches: 2
+
+  global_boundary_motion:
+    # Round 30: whole-organoid boundary-band motion diagnostic (see
+    # src/cardio_organoid/motion/boundary_motion.py) -- independent of,
+    # and does not change, the patch-grid pipeline above. Reuses the
+    # SAME single representative-frame SAM2 mask/contour, Farneback flow,
+    # and global-drift-correction already decided above; only adds a NEW
+    # spatial pooling gate (a band straddling the exact morphology mask's
+    # contour, via spatial_gate.boundary_band_mask, itself unchanged).
+    # inner/outer margins are ratios of the organoid's own equivalent
+    # diameter (never fixed pixels), kept as a SEPARATE, independently
+    # configurable pair from motion.signal_extraction.boundary_band above
+    # (that section is a different, already-decided comparison; this is a
+    # new diagnostic and must not silently inherit or perturb it).
+    inner_ratio: 0.05
+    outer_ratio: 0.05
+    # Robust-mean outlier trim, in MADs (see boundary_motion.robust_mean)
+    # -- self-relative per frame, never an absolute value.
+    robust_mean_mad_z: 3.0
+
+  sectorized_boundary:
+    # Round 31: sectorized whole-boundary diagnostic (see
+    # src/cardio_organoid/motion/boundary_sectors.py,
+    # src/cardio_organoid/functional/boundary_sector_consensus.py,
+    # scripts/sectorized_boundary_diagnostic.py). Independent of, and does
+    # not change, global_boundary_motion above -- reuses THAT section's
+    # inner_ratio/outer_ratio to build the SAME boundary-band gate, then
+    # splits it into angular wedges around the centroid. Not tuned
+    # against any manual reference.
+    #
+    # Number of equal-angle wedges the boundary band is split into.
+    n_sectors: 16
+    # Max time gap for pooling different sectors' events into one global-
+    # boundary consensus candidate = this fraction of the video's OWN
+    # pooled dominant period (same style as functional.beat_episodes.
+    # episode_tolerance_period_fraction / functional.beat_cycles.
+    # pairing_window_period_fraction below), never a fixed number of
+    # seconds shared across every video regardless of fps or beat rate.
+    consensus_tolerance_period_fraction: 0.3
+    # Fallback (seconds) when no valid pooled-dominant-period estimate
+    # exists for a video.
+    fallback_consensus_tolerance_s: 0.3
+    # Descriptive label threshold ONLY (see boundary_sector_consensus.
+    # provisional_global_label) -- explicitly NOT a validated classifier,
+    # mirrors functional.beat_episodes.global_min_participation_fraction's
+    # role for patch regions. Provisional default, not tuned.
+    min_participating_sector_fraction_for_global_label: 0.8
+
+    # Round 32: signal-quality / estimability QC (see
+    # cardio_organoid.functional.boundary_signal_quality,
+    # scripts/sectorized_boundary_diagnostic.py). Determines whether a
+    # video's sectorized-consensus global boundary BPM is reported as a
+    # number at all, or as NOT_ESTIMABLE/LOW_CONFIDENCE (see
+    # boundary_signal_quality.provisional_global_boundary_status).
+    # STARTING values only -- picked to be loosely consistent with this
+    # project's own first 5-video sample (see results/
+    # sectorized_boundary_diagnostic/*/signal_quality_distribution.json
+    # for the actual observed distribution these should be recalibrated
+    # against), NOT tuned against any manual reference, and explicitly
+    # expected to be revisited.
+    # NOTE (round 32, v2): on this project's own first 5-video run, this
+    # block's median_sector_snr came out INVERTED (the two known-bad
+    # videos, mature/Beating_D9_conv_a1 and mature/Beating_D9_slit_a1,
+    # scored the HIGHEST SNR of all 5, because their whole-boundary
+    # waveform is almost entirely flat, which makes the robust noise
+    # floor computed from it tiny, so even a single spike looks enormous
+    # in ratio terms), and median_participating_sector_fraction /
+    # consensus_ibi_cv clustered similarly across ALL 5 videos regardless
+    # of known ground truth (mature/D10_slit_a1 vs the two D9 videos).
+    # Per project decision, this block's functions/config are KEPT and
+    # still computed (results/sectorized_boundary_diagnostic/.../
+    # signal_quality_report -- diagnostic only), but no longer decide
+    # global_boundary_bpm_reported -- see
+    # whole_boundary_estimability_candidate_rule below instead.
+    signal_quality:
+      min_candidates_for_any_estimate: 5
+      not_estimable_max_median_sector_snr: 1.5
+      not_estimable_max_participating_fraction: 0.15
+      estimable_min_median_sector_snr: 3.0
+      estimable_min_participating_fraction: 0.5
+      estimable_max_consensus_ibi_cv: 0.35
+    # Fractions of a video's own largest observed whole-boundary
+    # high-confidence cycle amplitude used by the (purely descriptive,
+    # non-deciding) amplitude-gated double-counting re-check -- see
+    # beat_cycle_alternation_diagnostics.amplitude_gated_alternation.
+    amplitude_gate_fractions_of_max: [0.1, 0.25, 0.5]
+
+    # Round 32 (v2): a CANDIDATE (explicitly NOT validated, NOT final)
+    # estimability rule over 3 axes computed directly from the
+    # whole-boundary high-confidence beat-cycle sequence (see
+    # cardio_organoid.functional.beat_cycle_alternation_diagnostics.
+    # whole_boundary_signal_quality_axes / provisional_status_candidate):
+    # whole_boundary_consensus_cycle_count, amplitude_homogeneity_fraction,
+    # temporal_coverage. Per project decision, this candidate rule must be
+    # tested BLIND on ADDITIONAL videos (beyond this project's first 5)
+    # before being trusted/finalized -- these starting cutoffs are
+    # illustrative, loosely informed by (but NOT fitted/optimized to)
+    # that first 5-video sample, and must not be re-tuned further against
+    # that same 5-video set.
+    whole_boundary_estimability_candidate_rule:
+      # Which "n_cycles_at_or_above_fraction_of_max" bucket (see
+      # cycle_amplitude_distribution) counts as "sufficiently strong" for
+      # amplitude_homogeneity_fraction / temporal_coverage /
+      # longest_gap_between_valid_cycles_s.
+      homogeneity_amplitude_fraction: 0.25
+      not_estimable_max_cycle_count: 5
+      estimable_min_cycle_count: 15
+      estimable_min_amplitude_homogeneity_fraction: 0.5
+      estimable_min_temporal_coverage: 0.5
+
+functional:
+  beat_episodes:
+    # Round 19: region-first event decomposition + beat-episode grouping
+    # on top of beat_events.py's UNCHANGED per-region detection (see
+    # src/cardio_organoid/functional/beat_episodes.py module docstring).
+    # None of these values were tuned against any manual reference --
+    # they are provisional defaults, same posture as beat_events.py's
+    # MIN_PROMINENCE_RATIO/MIN_SEPARATION_PERIOD_FRACTION.
+    #
+    # Episode-grouping time tolerance = this fraction of the video's OWN
+    # pooled dominant period (median of its analyzed regions' dominant
+    # frequencies -- see beat_episodes.pooled_dominant_period_s), never a
+    # fixed number of seconds shared across every video regardless of fps
+    # or beat rate.
+    episode_tolerance_period_fraction: 0.3
+    # If no valid dominant-frequency estimate exists for a video (e.g. all
+    # regions failed periodicity estimation), fall back to this fixed
+    # tolerance in seconds -- explicitly a fallback, not the primary rule.
+    fallback_episode_tolerance_s: 0.3
+    # An episode is labeled "global_coordinated_candidate" (provisional,
+    # descriptive only -- see module docstring) only when at least this
+    # fraction of the video's analyzed regions participate in it.
+    # Below this, with >1 participating region, it is labeled
+    # "sequential_regional_candidate" instead.
+    global_min_participation_fraction: 0.8
+    # Within one region and one polarity, an event pair closer together
+    # than this fraction of that region's OWN mean inter-event gap is
+    # flagged possible_doublet_or_detector_artifact (never removed).
+    doublet_interval_ratio: 0.5
+    # Matching window (seconds) for the OPTIONAL positive-episode ->
+    # negative-episode delay diagnostic. Reuses beat_events.py's existing
+    # GLOBAL_BEAT_TOLERANCE_S value for consistency, not re-derived here.
+    cross_polarity_match_window_s: 0.3
+
+  beat_cycles:
+    # Round 21: positive/negative RAW-EVENT pairing into "beat cycles"
+    # (see src/cardio_organoid/functional/beat_cycles.py). Does not
+    # change beat_events.py's detection or beat_episodes.py's episode
+    # grouping -- purely an additional representation layer. Provisional,
+    # not tuned against any manual reference.
+    #
+    # Max time gap allowed between a positive event and a negative event
+    # for them to be pairing candidates = this fraction of the REGION'S
+    # OWN pooled dominant period (median of its positive/negative
+    # dominant-frequency estimates -- see
+    # beat_episodes.pooled_dominant_period_s), never a fixed number of
+    # seconds. Wider than episode_tolerance_period_fraction above because
+    # a positive/negative pair from the SAME oscillation is typically
+    # separated by roughly half a period, not a small fraction of one.
+    pairing_window_period_fraction: 0.5
+    # Fallback (seconds) when no valid per-region dominant-period
+    # estimate exists.
+    fallback_pairing_window_s: 0.3
+
+  biological_beats:
+    # Round 29: merges already-built beat_cycles (round 21, UNCHANGED
+    # pairing algorithm) that sit unusually close together into one
+    # "biological beat" -- see
+    # src/cardio_organoid/functional/biological_beats.py. Does not change
+    # beat_events.py's detection or beat_cycles.py's pairing; purely an
+    # additional representation layer, and a no-op (nothing merged) for
+    # any region where no robust reference period can be estimated.
+    #
+    # Merge window = this fraction of the reference period (a robust
+    # MEDIAN of consecutive same-polarity raw-event gaps -- see
+    # biological_beats.robust_reference_period_s -- NEVER an FFT/spectral
+    # estimate, which round 29's manual QC found can be harmonic-locked;
+    # and NEVER a fixed absolute number of seconds). Chosen so that
+    # early/slit_a1's observed ~0.4-0.6s local-doublet gaps (against its
+    # own ~1.8s robust period) merge, while its normal ~1.8s beat-to-beat
+    # gaps do not -- NOT tuned to reproduce any particular manual beat
+    # count.
+    merge_period_fraction: 0.4
+
+  # Source videos that must never be used in analysis, with the reason on
+  # record (CLAUDE.md #11: exclusions must be reported, not silently
+  # discarded). Checked by scripts before any per-video processing.
+  excluded_videos:
+    - path: "data/D8 beating/conv/c1.avi"
+      reason: >-
+        Corrupted/truncated source file (252 bytes; sibling sample videos
+        are ~1.3-1.6GB). OpenCV reports frame_count=0 and cannot read frame
+        0. Needs re-export/re-copy from the original source before use.

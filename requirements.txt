@@ -1,0 +1,11 @@
+# Exact versions of the environment that produced the validated P36/Conv runs (docs/DEPENDENCIES.md).
+numpy==2.4.6
+opencv-python-headless==5.0.0.93
+scipy==1.17.1
+scikit-learn==1.9.1
+matplotlib==3.11.1
+PyYAML==6.0.3
+# torch is imported (not used for computation) by the engine. On Windows the PyPI wheel is CPU-only;
+# on Linux use:  pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0
+pytest==9.1.1

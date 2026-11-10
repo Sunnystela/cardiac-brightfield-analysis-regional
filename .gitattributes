@@ -1,0 +1,2 @@
+# Engine files are sha256-locked (configs/ENGINE_MANIFEST.json): store and check out bytes exactly.
+* -text

@@ -1,0 +1,1716 @@
+{
+  "generated_utc": "2026-11-03T17:22:23+00:00",
+  "original_repo": "cardiac-organoid-agent",
+  "original_git": {
+    "head": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+    "dirty_paths": [
+      "M scripts/global_boundary_motion_diagnostic.py",
+      " M scripts/motion_observability_diagnostic.py",
+      " M src/cardio_organoid/functional/period_evidence_confidence.py",
+      " M src/cardio_organoid/morphology/features.py",
+      " M src/cardio_organoid/pipeline/analyze.py",
+      " M tests/test_morphology_features.py",
+      " M tests/test_period_evidence_confidence.py",
+      "?? P36_CODE_FORMULA_AUDIT.zip",
+      "?? configs/data_curation_master_qc.yaml",
+      "?? configs/segmentation_component_feasibility.yaml",
+      "?? configs/segmentation_qc_development.yaml",
+      "?? configs/segmentation_translucent_case_discovery_round11.yaml",
+      "?? configs/segmentation_translucent_recovery_round10.yaml",
+      "?? configs/segmentation_translucent_recovery_round9.yaml",
+      "?? configs/segmentation_translucent_targeted_discovery_round12.yaml",
+      "?? results/_REVIEW_LATEST/CANDIDATE_ACCEPTABILITY_ABSTENTION_DIAGNOSTIC/",
+      "?? results/_REVIEW_LATEST/CANDIDATE_SELECTOR_ACTIVE_LEARNING_PLAN.zip",
+      "?? results/_REVIEW_LATEST/CANDIDATE_SELECTOR_ACTIVE_LEARNING_PLAN/",
+      "?? results/_REVIEW_LATEST/CANDIDATE_SELECTOR_P39_BLIND_VALIDATION/",
+      "?? results/_REVIEW_LATEST/MORPHOLOGY_REFERENCE_QC/",
+      "?? results/_REVIEW_LATEST/P36_CONV_LONGITUDINAL_DEVELOPMENT/",
+      "?? results/_REVIEW_LATEST/P36_CONV_SCREENING/",
+      "?? results/_REVIEW_LATEST/P36_CONV_V4_ARCHITECTURE_HOLDOUT_DIAGNOSTIC_G3/",
+      "?? results/_REVIEW_LATEST/P39_Conv_a3_LONGITUDINAL_MORPHOLOGY/",
+      "?? results/_REVIEW_LATEST/P39_Slit_a1_LONGITUDINAL_MORPHOLOGY/",
+      "?? results/_archives/",
+      "?? results/data_curation/",
+      "?? results/manual_reference_longitudinal/",
+      "?? results/motion_pipeline/CLEANUP_NOTICE_round7.txt",
+      "?? results/segmentation_qc_development/",
+      "?? \"results/\\354\\203\\210 \\355\\217\\264\\353\\215\\224.zip\"",
+      "?? \"results/\\354\\203\\210 \\355\\217\\264\\353\\215\\224/\"",
+      "?? scripts/apply_user_confirmed_review_resolutions.py",
+      "?? scripts/apply_visual_review_p39_conv_a3.py",
+      "?? scripts/auto_segmentation_vs_user_confirmed_validation.py",
+      "?? scripts/candidate_generation_vs_selection_diagnostic.py",
+      "?? scripts/data_curation_master_qc_reconciliation.py",
+      "?? scripts/generic_well_functional_onset_diagnostic.py",
+      "?? scripts/generic_well_longitudinal_morphology_pilot.py",
+      "?? scripts/longitudinal_dataset_inventory.py",
+      "?? scripts/longitudinal_identity_finalization_diagnostic.py",
+      "?? scripts/longitudinal_identity_verification_diagnostic.py",
+      "?? scripts/longitudinal_modality_aware_dry_run.py",
+      "?? scripts/manual_assisted_whole_organoid_segmentation_diagnostic.py",
+      "?? scripts/morphology_reference_qc_diagnostic.py",
+      "?? scripts/multi_well_stage_diversity_collection_diagnostic.py",
+      "?? scripts/one_video_patch_size_diagnostic.py",
+      "?? scripts/p36_conv_8well_human_qc_contact_sheets.py",
+      "?? scripts/p36_conv_a1_development_trajectory_diagnostic.py",
+      "?? scripts/p36_conv_a1_functional_onset_diagnostic.py",
+      "?? scripts/p36_conv_a1_modality_aware_v4_diagnostic.py",
+      "?? scripts/p36_conv_a1_user_qc_update_diagnostic.py",
+      "?? scripts/p36_conv_build_full_review_package.py",
+      "?? scripts/p36_conv_candidate_selector_active_learning_plan.py",
+      "?? scripts/p36_conv_candidate_selector_feasibility.py",
+      "?? scripts/p36_conv_candidate_selector_human_labeling.py",
+      "?? scripts/p36_conv_first_pass_outputs.py",
+      "?? scripts/p36_conv_first_pass_screening.py",
+      "?? scripts/p36_conv_g3_v4_holdout_diagnostic.py",
+      "?? scripts/p36_conv_human_qc_failure_audit.py",
+      "?? scripts/p36_conv_ingest_owner_review.py",
+      "?? scripts/p36_conv_integrated_batch.py",
+      "?? scripts/p36_conv_integrated_pilot.py",
+      "?? scripts/p36_conv_screening_diagnostic.py",
+      "?? scripts/p39_abstention_diagnostic.py",
+      "?? scripts/p39_abstention_diagnostic_run.py",
+      "?? scripts/p39_blind_validation_adjudicate.py",
+      "?? scripts/p39_blind_validation_evaluate.py",
+      "?? scripts/p39_blind_validation_setup.py",
+      "?? scripts/p39_conv_a3_longitudinal_morphology_pilot.py",
+      "?? scripts/p39_slit_a1_d10_d12_corrected_trajectory_reevaluation.py",
+      "?? scripts/p39_slit_a1_d10_d12_segmentation_review_diagnostic.py",
+      "?? scripts/persist_d10_user_confirmed_mask.py",
+      "?? scripts/persist_p39_slit_a1_d10_d12_user_confirmed_masks.py",
+      "?? scripts/persist_user_confirmed_candidate_masks.py",
+      "?? scripts/pixel_first_motion_aggregate.py",
+      "?? scripts/pixel_first_motion_batch.py",
+      "?? scripts/pixel_first_motion_diagnostic.py",
+      "?? scripts/prompt_and_selection_prototype_comparison_diagnostic.py",
+      "?? scripts/segmentation_component_feasibility_round8.py",
+      "?? scripts/segmentation_component_pilot_package.py",
+      "?? scripts/segmentation_detailed_annotation_reconciliation_round13.py",
+      "?? scripts/segmentation_qc_candidate_cache.py",
+      "?? scripts/segmentation_qc_development.py",
+      "?? scripts/segmentation_qc_development_round2.py",
+      "?? scripts/segmentation_qc_development_round3_ingest.py",
+      "?? scripts/segmentation_qc_development_round4_label_policy.py",
+      "?? scripts/segmentation_qc_development_round5_review_package.py",
+      "?? scripts/segmentation_qc_development_round6_labels.py",
+      "?? scripts/segmentation_qc_development_round7_manifest_revision.py",
+      "?? scripts/segmentation_qc_development_round9_manifest_v4.py",
+      "?? scripts/segmentation_texture_feasibility.py",
+      "?? scripts/segmentation_translucent_annotation_round9.py",
+      "?? scripts/segmentation_translucent_case_discovery_round11.py",
+      "?? scripts/segmentation_translucent_recovery_pilot_round10.py",
+      "?? scripts/segmentation_translucent_round12_results.py",
+      "?? scripts/segmentation_translucent_targeted_discovery_round12.py",
+      "?? scripts/stage_gate_early_vs_compact_diagnostic.py",
+      "?? scripts/storage_cleanup_round7.py",
+      "?? scripts/storage_footprint_audit.py",
+      "?? scripts/trajectory_functional_onset_diagnostic.py",
+      "?? scripts/trajectory_stage_model_diagnostic.py",
+      "?? scripts/trajectory_stage_model_v2_qc_aware_diagnostic.py",
+      "?? scripts/trajectory_stage_model_v3_persistence_aware_diagnostic.py",
+      "?? scripts/well_trajectory_report_lib.py",
+      "?? scripts/whole_organoid_mask_comparison_diagnostic.py",
+      "?? scripts/whole_organoid_reference_strategy_recomparison_diagnostic.py",
+      "?? src/cardio_organoid/io/longitudinal_identity.py",
+      "?? src/cardio_organoid/io/longitudinal_metadata_xml.py",
+      "?? src/cardio_organoid/io/longitudinal_paths.py",
+      "?? src/cardio_organoid/motion/pixel_first.py",
+      "?? src/cardio_organoid/pipeline/image_branch.py",
+      "?? src/cardio_organoid/pipeline/longitudinal_schema.py",
+      "?? src/cardio_organoid/pipeline/prototype_trajectory_stage_model.py",
+      "?? src/cardio_organoid/pipeline/prototype_trajectory_stage_model_v2.py",
+      "?? src/cardio_organoid/pipeline/prototype_trajectory_stage_model_v3.py",
+      "?? src/cardio_organoid/pipeline/prototype_trajectory_stage_model_v4_modality_aware.py",
+      "?? src/cardio_organoid/pipeline/run_manifest.py",
+      "?? src/cardio_organoid/pipeline/segmentation_interface.py",
+      "?? src/cardio_organoid/pipeline/video_morphology_reference.py",
+      "?? src/cardio_organoid/qc/data_curation.py",
+      "?? src/cardio_organoid/qc/segmentation_qc_development/",
+      "?? src/cardio_organoid/segmentation/mask_evaluation_metrics.py",
+      "?? src/cardio_organoid/segmentation/prototype_auto_prompt.py",
+      "?? src/cardio_organoid/segmentation/prototype_candidate_selection.py",
+      "?? src/cardio_organoid/segmentation/prototype_early_stage_aggregate_segmentation.py",
+      "?? src/cardio_organoid/segmentation/prototype_stage_gate.py",
+      "?? tests/test_data_curation_master_qc.py",
+      "?? tests/test_interface_fail_closed.py",
+      "?? tests/test_longitudinal_identity.py",
+      "?? tests/test_longitudinal_metadata_xml.py",
+      "?? tests/test_longitudinal_paths.py",
+      "?? tests/test_longitudinal_schema.py",
+      "?? tests/test_mask_evaluation_metrics.py",
+      "?? tests/test_motion_observability_diagnostic.py",
+      "?? tests/test_pixel_first.py",
+      "?? tests/test_prototype_auto_prompt.py",
+      "?? tests/test_prototype_candidate_selection.py",
+      "?? tests/test_prototype_early_stage_aggregate_segmentation.py",
+      "?? tests/test_prototype_stage_gate.py",
+      "?? tests/test_prototype_trajectory_stage_model.py",
+      "?? tests/test_prototype_trajectory_stage_model_v2.py",
+      "?? tests/test_prototype_trajectory_stage_model_v3.py",
+      "?? tests/test_prototype_trajectory_stage_model_v4_modality_aware.py",
+      "?? tests/test_round10_translucent_recovery.py",
+      "?? tests/test_round13_annotation_reconciliation.py",
+      "?? tests/test_round7_manifest_and_component_pilot.py",
+      "?? tests/test_round8_component_features.py",
+      "?? tests/test_round9_component_screening.py",
+      "?? tests/test_segmentation_interface.py",
+      "?? tests/test_segmentation_qc_development.py",
+      "?? tests/test_storage_and_texture_audit.py",
+      "?? tests/test_video_morphology_reference.py"
+    ]
+  },
+  "entry_scripts": [
+    "scripts/p36_conv_first_pass_screening.py",
+    "scripts/p36_conv_first_pass_outputs.py",
+    "scripts/pixel_first_motion_batch.py",
+    "scripts/pixel_first_motion_aggregate.py"
+  ],
+  "extra_modules": [
+    "src/cardio_organoid/qc/__init__.py",
+    "src/cardio_organoid/qc/data_curation.py"
+  ],
+  "third_party_imports_static": [
+    "cv2",
+    "joblib",
+    "matplotlib",
+    "numpy",
+    "sam2",
+    "scipy",
+    "sklearn",
+    "torch",
+    "yaml"
+  ],
+  "run_manifests": {
+    "seg_v2": {
+      "run_manifest": "results/_scratch_runs/p36_conv_segmentation_manifest_v2_human_reviewed_20260928T155748Z/manifest/run_manifest.json",
+      "timestamp_utc": "2026-09-28T15:57:51+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "f08c9bb73985eb315369725d47d798a39df7d380382adbed9f5e741184425025",
+      "code_snapshot_sha256_actual": "f08c9bb73985eb315369725d47d798a39df7d380382adbed9f5e741184425025",
+      "code_snapshot_intact": true
+    },
+    "fp_morphology": {
+      "run_manifest": "results/_scratch_runs/p36_conv_first_pass_screening_20260928T155956Z/manifests/morphology/run_manifest.json",
+      "timestamp_utc": "2026-09-28T15:59:56+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "35bec54fe2622f1cab674620f5cd3ae6905311feb9d09cfd8a4bcaf1f8d1f1b6",
+      "code_snapshot_sha256_actual": "35bec54fe2622f1cab674620f5cd3ae6905311feb9d09cfd8a4bcaf1f8d1f1b6",
+      "code_snapshot_intact": true
+    },
+    "fp_functional_plan": {
+      "run_manifest": "results/_scratch_runs/p36_conv_first_pass_screening_20260928T155956Z/manifests/functional_plan/run_manifest.json",
+      "timestamp_utc": "2026-09-28T16:00:05+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "31bd52564697487a3e1e8fb43c958c048da01ff7d01d8117b25da7af3a694b4e",
+      "code_snapshot_sha256_actual": "31bd52564697487a3e1e8fb43c958c048da01ff7d01d8117b25da7af3a694b4e",
+      "code_snapshot_intact": true
+    },
+    "fp_functional_run": {
+      "run_manifest": "results/_scratch_runs/p36_conv_first_pass_screening_20260928T155956Z/manifests/functional_run/run_manifest.json",
+      "timestamp_utc": "2026-09-28T16:00:25+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "8f025b6eefa77b765813e9d60b69afbd0df551714e29e8f74036112eec2660ec",
+      "code_snapshot_sha256_actual": "8f025b6eefa77b765813e9d60b69afbd0df551714e29e8f74036112eec2660ec",
+      "code_snapshot_intact": true
+    },
+    "fp_functional_aggregate": {
+      "run_manifest": "results/_scratch_runs/p36_conv_first_pass_screening_20260928T155956Z/manifests/functional_aggregate/run_manifest.json",
+      "timestamp_utc": "2026-09-28T18:11:30+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "66e138e295dc458e5f89665c58ee643bb715c96a8280b1e9e6d73b835a196b49",
+      "code_snapshot_sha256_actual": "66e138e295dc458e5f89665c58ee643bb715c96a8280b1e9e6d73b835a196b49",
+      "code_snapshot_intact": true
+    },
+    "pf_plan": {
+      "run_manifest": "results/_scratch_runs/pixel_first_screening_P36_Conv_9well_20260929T062953Z/manifests/plan/run_manifest.json",
+      "timestamp_utc": "2026-09-29T06:30:01+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "69e40beaa8090581bf9cf41e36da8318418d7606fb6ac52b6947a6ec5c7832c9",
+      "code_snapshot_sha256_actual": "69e40beaa8090581bf9cf41e36da8318418d7606fb6ac52b6947a6ec5c7832c9",
+      "code_snapshot_intact": true
+    },
+    "pf_primitives": {
+      "run_manifest": "results/_scratch_runs/pixel_first_screening_P36_Conv_9well_20260929T062953Z/manifests/primitives/run_manifest.json",
+      "timestamp_utc": "2026-09-29T07:10:46+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "ae209e501ec3daed5efe5ca441605781e989053f329a5de1420d06cc238a4120",
+      "code_snapshot_sha256_actual": "ae209e501ec3daed5efe5ca441605781e989053f329a5de1420d06cc238a4120",
+      "code_snapshot_intact": true
+    },
+    "pf_derive": {
+      "run_manifest": "results/_scratch_runs/pixel_first_screening_P36_Conv_9well_20260929T062953Z/manifests/derive/run_manifest.json",
+      "timestamp_utc": "2026-09-29T07:34:39+00:00",
+      "git_commit": "dca4b015511dedc3c1bc33fd63b423cba54636d7",
+      "git_dirty_code": true,
+      "config_sha256": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "code_snapshot_sha256_recorded": "cbdc2bc1af30661d707a0a548b9ff248013ca838216648482c805509fb0d08ba",
+      "code_snapshot_sha256_actual": "cbdc2bc1af30661d707a0a548b9ff248013ca838216648482c805509fb0d08ba",
+      "code_snapshot_intact": true
+    }
+  },
+  "files": [
+    {
+      "original_path": "configs/default.yaml",
+      "standalone_path": "configs/default.yaml",
+      "sha256_original": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "sha256_standalone": "aab9e85b92ff709b0a37be0620f41676208552b424ada2f74d5e306804cd67fb",
+      "copy_identical": true,
+      "in_import_closure": false,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/_output_safety.py",
+      "standalone_path": "engine_scripts/_output_safety.py",
+      "sha256_original": "32b27f1e431aa5bb639dbf829bc2fa7cf4b5eef32b439722e253feaec907ef3b",
+      "sha256_standalone": "32b27f1e431aa5bb639dbf829bc2fa7cf4b5eef32b439722e253feaec907ef3b",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/beat_event_detection_validation.py",
+      "standalone_path": "engine_scripts/beat_event_detection_validation.py",
+      "sha256_original": "0f3fdf7ecccf7b094ce837792ce1e78bfefda749d61f58dfb3debb28b2c83c2d",
+      "sha256_standalone": "0f3fdf7ecccf7b094ce837792ce1e78bfefda749d61f58dfb3debb28b2c83c2d",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/d10_secondary_cause_diagnostic.py",
+      "standalone_path": "engine_scripts/d10_secondary_cause_diagnostic.py",
+      "sha256_original": "49bf11572ba5164531d078260192bd006aed8960e0412a2fd894c3385137cf8b",
+      "sha256_standalone": "49bf11572ba5164531d078260192bd006aed8960e0412a2fd894c3385137cf8b",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/generic_well_longitudinal_morphology_pilot.py",
+      "standalone_path": "engine_scripts/generic_well_longitudinal_morphology_pilot.py",
+      "sha256_original": "bbb90d42222b4ccb81a8e9de57aa91323a9a42b0bf16eb3ed7420739b5f7e6c6",
+      "sha256_standalone": "bbb90d42222b4ccb81a8e9de57aa91323a9a42b0bf16eb3ed7420739b5f7e6c6",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/global_boundary_motion_diagnostic.py",
+      "standalone_path": "engine_scripts/global_boundary_motion_diagnostic.py",
+      "sha256_original": "c054ac1cc464b9f6850945a4739609a234a7adf3689cd79ee273ab3b0393b7a3",
+      "sha256_standalone": "c054ac1cc464b9f6850945a4739609a234a7adf3689cd79ee273ab3b0393b7a3",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/longitudinal_modality_aware_dry_run.py",
+      "standalone_path": "engine_scripts/longitudinal_modality_aware_dry_run.py",
+      "sha256_original": "b45bf3cd61a7b30b6560294221436d4cdb4fcea81b17d5c64b314ef599b81ddb",
+      "sha256_standalone": "b45bf3cd61a7b30b6560294221436d4cdb4fcea81b17d5c64b314ef599b81ddb",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/motion_observability_diagnostic.py",
+      "standalone_path": "engine_scripts/motion_observability_diagnostic.py",
+      "sha256_original": "470015be8e6ce7a94d3c1370f397a707b29f28cd1357d9ffba17325faa898f8a",
+      "sha256_standalone": "470015be8e6ce7a94d3c1370f397a707b29f28cd1357d9ffba17325faa898f8a",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p36_conv_candidate_selector_feasibility.py",
+      "standalone_path": "engine_scripts/p36_conv_candidate_selector_feasibility.py",
+      "sha256_original": "2f588c7709aa86034b9fff60a7b6f67591a1abec388d07ff7e836c34e30aa589",
+      "sha256_standalone": "2f588c7709aa86034b9fff60a7b6f67591a1abec388d07ff7e836c34e30aa589",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p36_conv_candidate_selector_human_labeling.py",
+      "standalone_path": "engine_scripts/p36_conv_candidate_selector_human_labeling.py",
+      "sha256_original": "8a72288eb6d72ad3dee7c0826c0af9abc2ff73554d9d76cdd6f869c15b89ddb9",
+      "sha256_standalone": "8a72288eb6d72ad3dee7c0826c0af9abc2ff73554d9d76cdd6f869c15b89ddb9",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p36_conv_first_pass_outputs.py",
+      "standalone_path": "engine_scripts/p36_conv_first_pass_outputs.py",
+      "sha256_original": "c514d6558b49193d5ccff966897e9d78d001a5b2e4adc6fbda03e979817305f9",
+      "sha256_standalone": "c514d6558b49193d5ccff966897e9d78d001a5b2e4adc6fbda03e979817305f9",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "absent",
+        "fp_morphology": "absent",
+        "fp_functional_plan": "absent",
+        "fp_functional_run": "absent",
+        "fp_functional_aggregate": "DIFFERS(snapshot e86cb523fb3e)",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p36_conv_first_pass_screening.py",
+      "standalone_path": "engine_scripts/p36_conv_first_pass_screening.py",
+      "sha256_original": "501f81770062381ef469f13e4cae01acd555a458510f933c22d661db9479ef11",
+      "sha256_standalone": "501f81770062381ef469f13e4cae01acd555a458510f933c22d661db9479ef11",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "absent",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p36_conv_human_qc_failure_audit.py",
+      "standalone_path": "engine_scripts/p36_conv_human_qc_failure_audit.py",
+      "sha256_original": "0d7f67c15270a0b2fd990ac268b1a4393433942fb4f447a155fcc7a296461197",
+      "sha256_standalone": "0d7f67c15270a0b2fd990ac268b1a4393433942fb4f447a155fcc7a296461197",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p36_conv_integrated_batch.py",
+      "standalone_path": "engine_scripts/p36_conv_integrated_batch.py",
+      "sha256_original": "76802179684f6e1533592693c42c3a90203a7b8c15f5beef0fa0446c8651df00",
+      "sha256_standalone": "76802179684f6e1533592693c42c3a90203a7b8c15f5beef0fa0446c8651df00",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p36_conv_screening_diagnostic.py",
+      "standalone_path": "engine_scripts/p36_conv_screening_diagnostic.py",
+      "sha256_original": "d682fb34559da564ed35beb20b2573b9a254dfe01b544c6a824fd0e9f09561d8",
+      "sha256_standalone": "d682fb34559da564ed35beb20b2573b9a254dfe01b544c6a824fd0e9f09561d8",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p39_abstention_diagnostic.py",
+      "standalone_path": "engine_scripts/p39_abstention_diagnostic.py",
+      "sha256_original": "665bedca584ab764e1f06c7ef6a2be5df28d8f7874247be7128178b519b2cd94",
+      "sha256_standalone": "665bedca584ab764e1f06c7ef6a2be5df28d8f7874247be7128178b519b2cd94",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p39_blind_validation_setup.py",
+      "standalone_path": "engine_scripts/p39_blind_validation_setup.py",
+      "sha256_original": "f542e887bb97578752c7c66fb32d66b169bb202490701f346927a1c92630eaed",
+      "sha256_standalone": "f542e887bb97578752c7c66fb32d66b169bb202490701f346927a1c92630eaed",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/p39_conv_a3_longitudinal_morphology_pilot.py",
+      "standalone_path": "engine_scripts/p39_conv_a3_longitudinal_morphology_pilot.py",
+      "sha256_original": "0daf6149bfcd51a43852ee68032421d700153602008ceed242fc25ad099bef9e",
+      "sha256_standalone": "0daf6149bfcd51a43852ee68032421d700153602008ceed242fc25ad099bef9e",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/patch_phase_consensus_diagnostic.py",
+      "standalone_path": "engine_scripts/patch_phase_consensus_diagnostic.py",
+      "sha256_original": "2cf5b2d7a6ab4b7e4ea9a85386de7051e0ab2d20c63c9f49aa9dad5cbc3f07e9",
+      "sha256_standalone": "2cf5b2d7a6ab4b7e4ea9a85386de7051e0ab2d20c63c9f49aa9dad5cbc3f07e9",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/pixel_first_motion_aggregate.py",
+      "standalone_path": "engine_scripts/pixel_first_motion_aggregate.py",
+      "sha256_original": "4a9857bcbc69ba95fa7a31262539cd9aac43de5586bf5ef1fe72b2190f352426",
+      "sha256_standalone": "4a9857bcbc69ba95fa7a31262539cd9aac43de5586bf5ef1fe72b2190f352426",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "absent",
+        "fp_morphology": "absent",
+        "fp_functional_plan": "absent",
+        "fp_functional_run": "absent",
+        "fp_functional_aggregate": "absent",
+        "pf_plan": "absent",
+        "pf_primitives": "DIFFERS(snapshot 4132b7c2af7e)",
+        "pf_derive": "DIFFERS(snapshot 4132b7c2af7e)"
+      }
+    },
+    {
+      "original_path": "scripts/pixel_first_motion_batch.py",
+      "standalone_path": "engine_scripts/pixel_first_motion_batch.py",
+      "sha256_original": "b5dffb72c326e6ed8990bdc9dda116f0801c6782edc351cb2a52880ef3bd0d87",
+      "sha256_standalone": "b5dffb72c326e6ed8990bdc9dda116f0801c6782edc351cb2a52880ef3bd0d87",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "absent",
+        "fp_morphology": "absent",
+        "fp_functional_plan": "absent",
+        "fp_functional_run": "absent",
+        "fp_functional_aggregate": "absent",
+        "pf_plan": "DIFFERS(snapshot 1e1ccf524ae9)",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/pixel_first_motion_diagnostic.py",
+      "standalone_path": "engine_scripts/pixel_first_motion_diagnostic.py",
+      "sha256_original": "69bbb152d6df37d2d5e2cfd5d67110cff7742f7a367a17a44dc3082f24a6dd72",
+      "sha256_standalone": "69bbb152d6df37d2d5e2cfd5d67110cff7742f7a367a17a44dc3082f24a6dd72",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "absent",
+        "fp_morphology": "absent",
+        "fp_functional_plan": "absent",
+        "fp_functional_run": "absent",
+        "fp_functional_aggregate": "absent",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/reference_binary_motion_diagnostic.py",
+      "standalone_path": "engine_scripts/reference_binary_motion_diagnostic.py",
+      "sha256_original": "2a058660af74193132be6698d5ee800cbea3bd02bbd1092dc30494b254fa860a",
+      "sha256_standalone": "2a058660af74193132be6698d5ee800cbea3bd02bbd1092dc30494b254fa860a",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/run_sam2_phase1.py",
+      "standalone_path": "engine_scripts/run_sam2_phase1.py",
+      "sha256_original": "a04e5be359bb7bf668e12ee313e2ac354549b5b51429eea7816e165d62742466",
+      "sha256_standalone": "a04e5be359bb7bf668e12ee313e2ac354549b5b51429eea7816e165d62742466",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "scripts/well_trajectory_report_lib.py",
+      "standalone_path": "engine_scripts/well_trajectory_report_lib.py",
+      "sha256_original": "0629b4c3445a094573f0d013ab16f614d7ed2b3a3d7dde30528d8f479fa7782e",
+      "sha256_standalone": "0629b4c3445a094573f0d013ab16f614d7ed2b3a3d7dde30528d8f479fa7782e",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/__init__.py",
+      "standalone_path": "src/cardio_organoid/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/__init__.py",
+      "standalone_path": "src/cardio_organoid/functional/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/adaptive_timing_clustering.py",
+      "standalone_path": "src/cardio_organoid/functional/adaptive_timing_clustering.py",
+      "sha256_original": "7021ad9e516ec2111541a5c45441a8d7b3b1d04bb491c5ada32da35ba6234e16",
+      "sha256_standalone": "7021ad9e516ec2111541a5c45441a8d7b3b1d04bb491c5ada32da35ba6234e16",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/beat_cycle_metrics.py",
+      "standalone_path": "src/cardio_organoid/functional/beat_cycle_metrics.py",
+      "sha256_original": "29ddb1f9a48247f5e5d225c19cbb4a29ed7afdb19cc974f536d3b65c951dd75b",
+      "sha256_standalone": "29ddb1f9a48247f5e5d225c19cbb4a29ed7afdb19cc974f536d3b65c951dd75b",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/beat_cycles.py",
+      "standalone_path": "src/cardio_organoid/functional/beat_cycles.py",
+      "sha256_original": "ddfed097a3f1d49cdeae8711bef8d613e500053dc712523c0cbf4da2b0bba6d1",
+      "sha256_standalone": "ddfed097a3f1d49cdeae8711bef8d613e500053dc712523c0cbf4da2b0bba6d1",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/beat_episodes.py",
+      "standalone_path": "src/cardio_organoid/functional/beat_episodes.py",
+      "sha256_original": "d42ded2d801113cb5a8549622d9bb8b117c6cd321d6897383a9776fb820edfac",
+      "sha256_standalone": "d42ded2d801113cb5a8549622d9bb8b117c6cd321d6897383a9776fb820edfac",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/beat_events.py",
+      "standalone_path": "src/cardio_organoid/functional/beat_events.py",
+      "sha256_original": "cfc799192b270cdf03f00be6b6dda8af944b97d8a14cbae1fb99d446454fc408",
+      "sha256_standalone": "cfc799192b270cdf03f00be6b6dda8af944b97d8a14cbae1fb99d446454fc408",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/biological_beats.py",
+      "standalone_path": "src/cardio_organoid/functional/biological_beats.py",
+      "sha256_original": "f8a9511842777fbfcb9c11aa59a70d2416de2166dd3d2d131ce341170b0b15af",
+      "sha256_standalone": "f8a9511842777fbfcb9c11aa59a70d2416de2166dd3d2d131ce341170b0b15af",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/cycle_aware_consensus.py",
+      "standalone_path": "src/cardio_organoid/functional/cycle_aware_consensus.py",
+      "sha256_original": "d960ac542d58942b4e10f27fe8ae98d5f5fc10e040d67a377f562eb1f6d5a291",
+      "sha256_standalone": "d960ac542d58942b4e10f27fe8ae98d5f5fc10e040d67a377f562eb1f6d5a291",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/cycle_phase_assignment.py",
+      "standalone_path": "src/cardio_organoid/functional/cycle_phase_assignment.py",
+      "sha256_original": "c580dd61da4adf6308cca72dae21c6c58689ebd672dc23d896c38dd200975c85",
+      "sha256_standalone": "c580dd61da4adf6308cca72dae21c6c58689ebd672dc23d896c38dd200975c85",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/fundamental_period_consensus.py",
+      "standalone_path": "src/cardio_organoid/functional/fundamental_period_consensus.py",
+      "sha256_original": "997c9608e9ce0382979f44442310ede01bfd4d49710720b4f85d165c46566b53",
+      "sha256_standalone": "997c9608e9ce0382979f44442310ede01bfd4d49710720b4f85d165c46566b53",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/harmonic_aware_timing.py",
+      "standalone_path": "src/cardio_organoid/functional/harmonic_aware_timing.py",
+      "sha256_original": "97e5c4fe556bebbac55bc5f754bfba135f72df1ae7882c76a875f4a6c0c99308",
+      "sha256_standalone": "97e5c4fe556bebbac55bc5f754bfba135f72df1ae7882c76a875f4a6c0c99308",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/motion_evidence.py",
+      "standalone_path": "src/cardio_organoid/functional/motion_evidence.py",
+      "sha256_original": "7fb1806689322c6ff2c49647e99aa5bc89eed3a56c16eab49c155443955bbbe5",
+      "sha256_standalone": "7fb1806689322c6ff2c49647e99aa5bc89eed3a56c16eab49c155443955bbbe5",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/patch_beat_consensus.py",
+      "standalone_path": "src/cardio_organoid/functional/patch_beat_consensus.py",
+      "sha256_original": "16194956ebc32a77a031bc0c09f4f3b2bd1511e53b69a072ae10050f7aa26271",
+      "sha256_standalone": "16194956ebc32a77a031bc0c09f4f3b2bd1511e53b69a072ae10050f7aa26271",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/patch_timing_clustering.py",
+      "standalone_path": "src/cardio_organoid/functional/patch_timing_clustering.py",
+      "sha256_original": "fb6e281db49d14b6f79ca514717a7152da155a2e555153704d087511d02745a4",
+      "sha256_standalone": "fb6e281db49d14b6f79ca514717a7152da155a2e555153704d087511d02745a4",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/patch_timing_graph.py",
+      "standalone_path": "src/cardio_organoid/functional/patch_timing_graph.py",
+      "sha256_original": "c1ba5b674176c1887b097f7952a4d2a2d243f08cc24ff515a9245afece004eca",
+      "sha256_standalone": "c1ba5b674176c1887b097f7952a4d2a2d243f08cc24ff515a9245afece004eca",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/period_evidence_confidence.py",
+      "standalone_path": "src/cardio_organoid/functional/period_evidence_confidence.py",
+      "sha256_original": "b60d924a60b27134fbd2e38cb091257b3ba9c66c7527fd955d3924f931482eb5",
+      "sha256_standalone": "b60d924a60b27134fbd2e38cb091257b3ba9c66c7527fd955d3924f931482eb5",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/period_family_diagnostics.py",
+      "standalone_path": "src/cardio_organoid/functional/period_family_diagnostics.py",
+      "sha256_original": "7a0679757e1ce7e84ba6fef7040b890d465ecc62351de46a7eb32eab7981accc",
+      "sha256_standalone": "7a0679757e1ce7e84ba6fef7040b890d465ecc62351de46a7eb32eab7981accc",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/phenotype_axes.py",
+      "standalone_path": "src/cardio_organoid/functional/phenotype_axes.py",
+      "sha256_original": "0d326e8e095fb33836b379a0b41ceb3c158671db98a037f5b37c3e631814d449",
+      "sha256_standalone": "0d326e8e095fb33836b379a0b41ceb3c158671db98a037f5b37c3e631814d449",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/functional/regional_lag_diagnostics.py",
+      "standalone_path": "src/cardio_organoid/functional/regional_lag_diagnostics.py",
+      "sha256_original": "c906d4e56f4f804e2da344447cb1b164af9d62e4a4de90fe08b95d3d1c98a0b1",
+      "sha256_standalone": "c906d4e56f4f804e2da344447cb1b164af9d62e4a4de90fe08b95d3d1c98a0b1",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/io/__init__.py",
+      "standalone_path": "src/cardio_organoid/io/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/io/longitudinal_identity.py",
+      "standalone_path": "src/cardio_organoid/io/longitudinal_identity.py",
+      "sha256_original": "1b4b561b594c1c7dd6628e8f7b1e50c5242ffaad236d32d2806c1a9f17907c6d",
+      "sha256_standalone": "1b4b561b594c1c7dd6628e8f7b1e50c5242ffaad236d32d2806c1a9f17907c6d",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/io/longitudinal_metadata_xml.py",
+      "standalone_path": "src/cardio_organoid/io/longitudinal_metadata_xml.py",
+      "sha256_original": "5cc7a9e92edc1e78eff003a0aab97e3f097fd5b226711062b091bea4205fcad6",
+      "sha256_standalone": "5cc7a9e92edc1e78eff003a0aab97e3f097fd5b226711062b091bea4205fcad6",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/morphology/__init__.py",
+      "standalone_path": "src/cardio_organoid/morphology/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/morphology/features.py",
+      "standalone_path": "src/cardio_organoid/morphology/features.py",
+      "sha256_original": "d455a504ece8b04b79fa6b1b705ea60a28d7fa597cb40a46ca44cd31ca9d3902",
+      "sha256_standalone": "d455a504ece8b04b79fa6b1b705ea60a28d7fa597cb40a46ca44cd31ca9d3902",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/__init__.py",
+      "standalone_path": "src/cardio_organoid/motion/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/activity_significance.py",
+      "standalone_path": "src/cardio_organoid/motion/activity_significance.py",
+      "sha256_original": "d0cfce07c2a6589347412e9d576a70418646a5f03b53677f279ead67b44f351f",
+      "sha256_standalone": "d0cfce07c2a6589347412e9d576a70418646a5f03b53677f279ead67b44f351f",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/background_noise_threshold.py",
+      "standalone_path": "src/cardio_organoid/motion/background_noise_threshold.py",
+      "sha256_original": "2d2b5b44667e4fd9e59616bd9ef853fec3668c10ef6695afa80f6cd86f751c5e",
+      "sha256_standalone": "2d2b5b44667e4fd9e59616bd9ef853fec3668c10ef6695afa80f6cd86f751c5e",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/background_reference.py",
+      "standalone_path": "src/cardio_organoid/motion/background_reference.py",
+      "sha256_original": "94c6d79aca9d09d538af32bf51a47c2d2b8b59cc6b8f20167ec9fcd0a569e8da",
+      "sha256_standalone": "94c6d79aca9d09d538af32bf51a47c2d2b8b59cc6b8f20167ec9fcd0a569e8da",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/boundary_motion.py",
+      "standalone_path": "src/cardio_organoid/motion/boundary_motion.py",
+      "sha256_original": "8d4ca01bcab4bb69e99c41ae52ae79ff9a2c4fde0d7e19db61b1e9ee6566b41f",
+      "sha256_standalone": "8d4ca01bcab4bb69e99c41ae52ae79ff9a2c4fde0d7e19db61b1e9ee6566b41f",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/diagnostics.py",
+      "standalone_path": "src/cardio_organoid/motion/diagnostics.py",
+      "sha256_original": "2b49dcf10ba1bf453be7ecd8bbf0b0d192be152a559d627c2812c0c2591af8b5",
+      "sha256_standalone": "2b49dcf10ba1bf453be7ecd8bbf0b0d192be152a559d627c2812c0c2591af8b5",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/image_observability.py",
+      "standalone_path": "src/cardio_organoid/motion/image_observability.py",
+      "sha256_original": "05d00fc7ea98b035a099c2cdc633347e85dd27ae49e134ffc471b9607562e34b",
+      "sha256_standalone": "05d00fc7ea98b035a099c2cdc633347e85dd27ae49e134ffc471b9607562e34b",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/motion_confidence.py",
+      "standalone_path": "src/cardio_organoid/motion/motion_confidence.py",
+      "sha256_original": "f278b2954c61187df2e4e199224229cc4eefa5b15cc7fbadde24cdf3ba600b2f",
+      "sha256_standalone": "f278b2954c61187df2e4e199224229cc4eefa5b15cc7fbadde24cdf3ba600b2f",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/pixel_first.py",
+      "standalone_path": "src/cardio_organoid/motion/pixel_first.py",
+      "sha256_original": "6d9794e5f9ef98b9c19b89d6601b8a5845fa6ac536755be1dcb96d42b812f1f4",
+      "sha256_standalone": "6d9794e5f9ef98b9c19b89d6601b8a5845fa6ac536755be1dcb96d42b812f1f4",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "absent",
+        "fp_morphology": "absent",
+        "fp_functional_plan": "absent",
+        "fp_functional_run": "absent",
+        "fp_functional_aggregate": "absent",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/radial_flow.py",
+      "standalone_path": "src/cardio_organoid/motion/radial_flow.py",
+      "sha256_original": "13b2537d2cd759fe7647731a88cefc3f3ba669c128fa0fade62826d46a6e499f",
+      "sha256_standalone": "13b2537d2cd759fe7647731a88cefc3f3ba669c128fa0fade62826d46a6e499f",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/raft_flow.py",
+      "standalone_path": "src/cardio_organoid/motion/raft_flow.py",
+      "sha256_original": "b3f020252875c36f85e93a354c00b4d794c78844a49bdd7ba0023ffa864f3b4f",
+      "sha256_standalone": "b3f020252875c36f85e93a354c00b4d794c78844a49bdd7ba0023ffa864f3b4f",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/reference_binary_motion.py",
+      "standalone_path": "src/cardio_organoid/motion/reference_binary_motion.py",
+      "sha256_original": "13824e456dc69238378370e27c0db7f190d311d06e0397bf692b1bb4ce77f641",
+      "sha256_standalone": "13824e456dc69238378370e27c0db7f190d311d06e0397bf692b1bb4ce77f641",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/reference_frame_strategies.py",
+      "standalone_path": "src/cardio_organoid/motion/reference_frame_strategies.py",
+      "sha256_original": "c75ab822ae7d94a5df33a3ada445a018272e426022035ab16bd29669bb07177a",
+      "sha256_standalone": "c75ab822ae7d94a5df33a3ada445a018272e426022035ab16bd29669bb07177a",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/reliable_hotspot_candidates.py",
+      "standalone_path": "src/cardio_organoid/motion/reliable_hotspot_candidates.py",
+      "sha256_original": "588a0dc6b8a841b6433558abecf480d1428ffe45c968b0efd270a16ffbc6805a",
+      "sha256_standalone": "588a0dc6b8a841b6433558abecf480d1428ffe45c968b0efd270a16ffbc6805a",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/spatial_gate.py",
+      "standalone_path": "src/cardio_organoid/motion/spatial_gate.py",
+      "sha256_original": "f2ebb597c10fb98038f146cf38202b124257deaea6d10dc13c2e972fcf8565ea",
+      "sha256_standalone": "f2ebb597c10fb98038f146cf38202b124257deaea6d10dc13c2e972fcf8565ea",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/motion/spatial_patches.py",
+      "standalone_path": "src/cardio_organoid/motion/spatial_patches.py",
+      "sha256_original": "ec779cff60218dad28be31f6b6b9322d853b87f28e2c6f95cd5bd0d84405c5a7",
+      "sha256_standalone": "ec779cff60218dad28be31f6b6b9322d853b87f28e2c6f95cd5bd0d84405c5a7",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/__init__.py",
+      "standalone_path": "src/cardio_organoid/pipeline/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/analyze.py",
+      "standalone_path": "src/cardio_organoid/pipeline/analyze.py",
+      "sha256_original": "a4eb280093790b81d2e43c6d88fcd01b849c9f02e9eca61d6b1a783c9330b304",
+      "sha256_standalone": "a4eb280093790b81d2e43c6d88fcd01b849c9f02e9eca61d6b1a783c9330b304",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/image_branch.py",
+      "standalone_path": "src/cardio_organoid/pipeline/image_branch.py",
+      "sha256_original": "7670edf0a6e21ee3de6d0a72ba4bcb4d085c6109aa40a2baf7072837f3cb254a",
+      "sha256_standalone": "7670edf0a6e21ee3de6d0a72ba4bcb4d085c6109aa40a2baf7072837f3cb254a",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/longitudinal_schema.py",
+      "standalone_path": "src/cardio_organoid/pipeline/longitudinal_schema.py",
+      "sha256_original": "2dc0ca4e1f26eea44b74a2b4da7515fd18a02f9cd06a8514b4d8ab1192db2519",
+      "sha256_standalone": "2dc0ca4e1f26eea44b74a2b4da7515fd18a02f9cd06a8514b4d8ab1192db2519",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/prototype_trajectory_stage_model.py",
+      "standalone_path": "src/cardio_organoid/pipeline/prototype_trajectory_stage_model.py",
+      "sha256_original": "a1d304f5da003ce04e3c55f271a77916d1ec6bc3d2629b8d86d4ecd81af915d8",
+      "sha256_standalone": "a1d304f5da003ce04e3c55f271a77916d1ec6bc3d2629b8d86d4ecd81af915d8",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/prototype_trajectory_stage_model_v2.py",
+      "standalone_path": "src/cardio_organoid/pipeline/prototype_trajectory_stage_model_v2.py",
+      "sha256_original": "ee31c99445e779cc5ffc640902df6e23a6c59ef0486c410d2f7f95b456f9e018",
+      "sha256_standalone": "ee31c99445e779cc5ffc640902df6e23a6c59ef0486c410d2f7f95b456f9e018",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/prototype_trajectory_stage_model_v4_modality_aware.py",
+      "standalone_path": "src/cardio_organoid/pipeline/prototype_trajectory_stage_model_v4_modality_aware.py",
+      "sha256_original": "989e1d1b0a032ceacc3d451312a857d159249d6848a8125a5dbe90f0bbfb4994",
+      "sha256_standalone": "989e1d1b0a032ceacc3d451312a857d159249d6848a8125a5dbe90f0bbfb4994",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/run_manifest.py",
+      "standalone_path": "src/cardio_organoid/pipeline/run_manifest.py",
+      "sha256_original": "f202d129bee722196af45de0a529e83788fb9a9359ff41649ca3ae53a3d6c5f8",
+      "sha256_standalone": "f202d129bee722196af45de0a529e83788fb9a9359ff41649ca3ae53a3d6c5f8",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/segmentation_interface.py",
+      "standalone_path": "src/cardio_organoid/pipeline/segmentation_interface.py",
+      "sha256_original": "060e1df60f39472590e8dd96bf2e6cdca4bb5b3914992ef6395fd3e7eee48c21",
+      "sha256_standalone": "060e1df60f39472590e8dd96bf2e6cdca4bb5b3914992ef6395fd3e7eee48c21",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/pipeline/video_morphology_reference.py",
+      "standalone_path": "src/cardio_organoid/pipeline/video_morphology_reference.py",
+      "sha256_original": "64f42b1d2bd8666624d03c2e0b22473e5be0f027cd1e65602ff427ae9713a7e9",
+      "sha256_standalone": "64f42b1d2bd8666624d03c2e0b22473e5be0f027cd1e65602ff427ae9713a7e9",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/qc/__init__.py",
+      "standalone_path": "src/cardio_organoid/qc/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": false,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/qc/data_curation.py",
+      "standalone_path": "src/cardio_organoid/qc/data_curation.py",
+      "sha256_original": "f8519f140a6da0b36489a2367867f359746a9a9506b288177a236acf89d3b2ec",
+      "sha256_standalone": "f8519f140a6da0b36489a2367867f359746a9a9506b288177a236acf89d3b2ec",
+      "copy_identical": true,
+      "in_import_closure": false,
+      "run_snapshots": {
+        "seg_v2": "absent",
+        "fp_morphology": "absent",
+        "fp_functional_plan": "absent",
+        "fp_functional_run": "absent",
+        "fp_functional_aggregate": "absent",
+        "pf_plan": "absent",
+        "pf_primitives": "absent",
+        "pf_derive": "absent"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/segmentation/__init__.py",
+      "standalone_path": "src/cardio_organoid/segmentation/__init__.py",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_standalone": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    },
+    {
+      "original_path": "src/cardio_organoid/segmentation/sam2_segmenter.py",
+      "standalone_path": "src/cardio_organoid/segmentation/sam2_segmenter.py",
+      "sha256_original": "331c3a1dc8bfd00a5bc58c9eeb9a23bfaa777ae823a7eca6b13f4d9ebbe06d3a",
+      "sha256_standalone": "331c3a1dc8bfd00a5bc58c9eeb9a23bfaa777ae823a7eca6b13f4d9ebbe06d3a",
+      "copy_identical": true,
+      "in_import_closure": true,
+      "run_snapshots": {
+        "seg_v2": "identical",
+        "fp_morphology": "identical",
+        "fp_functional_plan": "identical",
+        "fp_functional_run": "identical",
+        "fp_functional_aggregate": "identical",
+        "pf_plan": "identical",
+        "pf_primitives": "identical",
+        "pf_derive": "identical"
+      }
+    }
+  ],
+  "summary": {
+    "n_files": 80,
+    "all_copies_identical": true,
+    "files_differing_from_any_snapshot": [
+      "scripts/p36_conv_first_pass_outputs.py",
+      "scripts/pixel_first_motion_aggregate.py",
+      "scripts/pixel_first_motion_batch.py"
+    ]
+  }
+}
