@@ -1,7 +1,29 @@
-# Cardiac Bright-field Standalone
+# Cardiac Bright-field Analysis — Regional Rhythm
+
+심장 오가노이드 bright-field 영상에서 **영역별 박동수(BPM)** 를 따로 구하는 확장판이다.
+기존 분석의 공식 `bpm`은 오가노이드 전체가 하나의 리듬으로 뛴다고 보고 값 하나만 낸다. 그래서 여러 곳이 서로 다른
+속도로 뛰면 그 차이가 하나의 값에 묻힌다. 이 저장소는 그 위에 다음 기능을 더한다.
+
+- 주기와 박동 타이밍이 비슷한 motion 패치를 그룹으로 묶고, 그룹마다 BPM, IBI, IBI CV를 계산한다.
+- 그룹 지도, 그룹별 파형, 거리행렬 그림을 만든다.
+- 같은 리듬으로 보이는 그룹 쌍에 합치기를 제안한다. 실제로 합치는 것은 사람이 Tk GUI에서 결정한다.
+
+해시로 잠긴 엔진 파일과 공식 출력 컬럼은 바꾸지 않았다. 새 값은 `regional_*` 컬럼과 `regional_rhythm/` 폴더에만
+쓴다. 계산 방법, 출력, 검증, 한계는 [CHANGES_REGIONAL_RHYTHM.md](CHANGES_REGIONAL_RHYTHM.md)에 있다.
+
+```text
+python launch.py regional-rhythm --from-run <out>/<obs>/legacy_rhythm [--input <영상> --record <records.json>] [--merge "G1+G3"]
+python launch.py regional-gui    [--from-run ...]
+python launch.py integrated ...  [--skip-regional]     # integrated는 legacy 다음에 regional 단계를 자동 실행
+```
+
+---
+
+아래는 원본 standalone 엔진(`cardiac-brightfield-analysis-main`)의 설명이다.
 
 Cardiac organoid bright-field 분석 엔진을 원본 연구 저장소(`cardiac-organoid-agent`)에서 분리한 독립 프로젝트다.
-**GUI는 없다.** 나중에 GUI가 호출할 공개 API(`adapters/`)와 명령행 진입점(`launch.py`)을 제공한다.
+나중에 GUI가 호출할 공개 API(`adapters/`)와 명령행 진입점(`launch.py`)을 제공한다. 엔진 자체에는 GUI가 없다.
+GUI는 regional 그룹 검토용 `regional_gui/`만 있다.
 
 - 계산 엔진은 2026-09-28/29 P36/Conv first-pass와 Pixel-first run을 실행한 코드와 **바이트 단위로 같은 복사본**이다
   (`src/`, `engine_scripts/`, `configs/default.yaml`). 수정하지 않았고 수정하면 안 된다. 모든 출력의 provenance에
@@ -14,7 +36,8 @@ Cardiac organoid bright-field 분석 엔진을 원본 연구 저장소(`cardiac-
 |---|---|
 | `src/cardio_organoid/` | 원본 분석 라이브러리 (그대로 복사) |
 | `engine_scripts/` | 계산 코드가 들어 있는 원본 스크립트 (그대로 복사, 원본 `scripts/`) |
-| `adapters/` | GUI/CLI용 공개 API (새로 작성) |
+| `adapters/` | GUI/CLI용 공개 API (새로 작성). regional 계산은 `regional_rhythm.py`, 그림은 `regional_rhythm_figures.py` |
+| `regional_gui/` | regional 그룹 확인, 합치기, 저장용 Tk 창 |
 | `configs/default.yaml` | 검증 run과 같은 설정 (sha256 `aab9e85b…`) |
 | `configs/ENGINE_MANIFEST.json` | 엔진 파일 목록, sha256, run snapshot 대조 |
 | `launch.py` | 명령행과 대화형 메뉴 진입점 |
