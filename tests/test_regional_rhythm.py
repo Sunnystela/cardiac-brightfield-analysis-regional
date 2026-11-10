@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from adapters.regional_rhythm import (RegionalRhythm, analyze_regional_rhythm, load_merge_file, parse_merges,
-                                      rank_weights, row_columns)
+                                      phase_lock, rank_weights, row_columns)
 
 FPS, FRAME_STEP, DURATION_S = 30.0, 3, 30.0
 STATE_A = "A_reliable_active_candidate"
@@ -78,16 +78,36 @@ def test_three_areas_become_three_groups(three_area):
         assert len({_area_of(k) for k in g["patch_ids"]}) == 1
         expected = 36 if _area_of(g["patch_ids"][0]) == 1 else 60
         assert g["bpm"] == pytest.approx(expected, rel=0.08)
-    assert s["status"] == "MULTIPLE_RHYTHMS"
+    # the 36 BPM area cannot be phase-locked to a 60 BPM area -> an independent rhythm is reported
+    assert s["status"] == "INDEPENDENT_RHYTHM_PRESENT"
+    rel = {_area_of(g["patch_ids"][0]): g["relation"] for g in groups}
+    assert sorted(rel.values()).count("reference") == 1
+    assert (rel[1] == "not_locked") or (rel[1] == "reference" and rel[0] == rel[2] == "not_locked")
 
 
 def test_same_rate_out_of_phase_pair_is_suggested_not_merged(three_area):
     s = three_area.summary()
     lab = {_area_of(g["patch_ids"][0]): g["label"] for g in s["groups_final"] if g["assigned"]}
     pair = next(p for p in s["pairs_final"] if {p["a"], p["b"]} == {lab[0], lab[2]})
-    assert pair["merge_suggested"] and abs(pair["best_lag_s"]) == pytest.approx(0.5, abs=0.15)
+    assert pair["merge_suggested"] and abs(pair["delay_s"]) == pytest.approx(0.5, abs=0.15)
+    assert pair["phase_lock_R"] > 0.9
     other = next(p for p in s["pairs_final"] if {p["a"], p["b"]} == {lab[0], lab[1]})
     assert not other["merge_suggested"]
+
+
+def test_phase_lock_separates_dropout_delay_from_other_rate():
+    rng = np.random.default_rng(1)
+    ref = np.arange(0.3, 30, 1.0) + rng.normal(0, 0.02, 30)              # 60 BPM, regular
+    keep = rng.random(len(ref)) > 0.35                                     # drops ~35 % of beats ...
+    follower = ref[keep] + 0.2 + rng.normal(0, 0.03, keep.sum())          # ... and is 0.2 s late
+    pl = phase_lock(ref, follower)
+    assert pl["locked"] and pl["delay_s"] == pytest.approx(0.2, abs=0.05)
+    assert pl["follow_fraction"] == pytest.approx(keep.mean(), abs=0.08)
+    other_rate = np.arange(0.5, 30, 60 / 43.0)                            # 43 BPM, unrelated
+    assert not phase_lock(ref, other_rate)["locked"]
+    half = phase_lock(ref, ref[::2] + 0.1)                                # 2:1 -- locked, follows ~50 %
+    assert half["locked"] and half["follow_fraction"] == pytest.approx(0.5, abs=0.05)
+    assert phase_lock(ref, ref[:3]) is None                               # too few beats
 
 
 def test_manual_merge_recomputes_metrics(three_area, tmp_path):

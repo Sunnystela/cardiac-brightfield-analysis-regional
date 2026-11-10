@@ -72,7 +72,8 @@ class RegionalApp:
         for text, cmd in (("Merge selected", self.merge_selected), ("Undo", self.undo), ("Reset", self.reset),
                           ("Save", self.save)):
             ttk.Button(row, text=text, command=cmd).pack(side="left", padx=2)
-        ttk.Label(left, text="Group pairs (yellow = merge suggested: same rate, shape matches after lag)").pack(anchor="w", pady=(8, 0))
+        ttk.Label(left, text="Group pairs (yellow = merge suggested: beat trains phase-locked = same rhythm,\n"
+                             "fixed delay, dropped beats allowed). Red group = independent of the reference.").pack(anchor="w", pady=(8, 0))
         self.pairs_box = tk.Listbox(left, width=58, height=14, font=("Consolas", 9), exportselection=False)
         self.pairs_box.pack(fill="both", expand=True)
         self.pairs_box.bind("<Double-Button-1>", self._select_pair)
@@ -145,7 +146,9 @@ class RegionalApp:
         if not run:
             messagebox.showinfo("Regional rhythm", "Choose a legacy_rhythm folder first.")
             return
+        # Tk variables may only be read on the main thread: capture everything before starting the worker
         video, record = self.var_video.get().strip(), self.var_record.get().strip()
+        mask_root = self.var_mask_root.get().strip() or (str(Path(record).parent) if record else "")
 
         def fn():
             from adapters.records import load_records
@@ -157,7 +160,7 @@ class RegionalApp:
                 rec = next((r for r in recs if _obs(r) == rr.cache["observation_id"]), recs[0] if len(recs) == 1 else None)
                 if rec is None:
                     raise LookupError(f"no record for {rr.cache['observation_id']} in {record}")
-                frame, mask = overlay_inputs(Path(video), rec, self.var_mask_root.get().strip() or Path(record).parent)
+                frame, mask = overlay_inputs(Path(video), rec, Path(mask_root))
             return rr, frame, mask
 
         def done(res):
@@ -184,7 +187,8 @@ class RegionalApp:
                 self._show(k)
             s = self.summary
             self.var_status.set(f"{s['observation_id']}: {s['status']} | groups: "
-                                + ", ".join(f"{g['label']}={g['bpm']:.1f}" for g in s["groups_final"] if g["assigned"] and g["bpm"])
+                                + ", ".join(f"{g['label']}={g['beat_train_bpm']:.1f}({g['relation']})"
+                                            for g in s["groups_final"] if g["assigned"] and g.get("beat_train_bpm"))
                                 + f" | {s['n_reliable']}/{s['n_patches']} reliable patches | {figs['map']['note'] or 'map on frame'}")
         self._run_bg("recomputing groups and figures", fn, done)
 
@@ -192,19 +196,24 @@ class RegionalApp:
         s = self.summary
         self.groups_box.delete(0, "end")
         self.final_groups = s["groups_final"]
+        rel = {"reference": "REF", "locked": "locked", "not_locked": "INDEP", "insufficient_beats": "few"}
         for g in self.final_groups:
-            bpm = f"{g['bpm']:6.1f}" if g["bpm"] else "     -"
+            pl = g.get("phase_lock") or {}
             frm = "+".join(g["merged_from"])
-            self.groups_box.insert("end", f"{g['label']:<4}{bpm} BPM  n={g['n_patches']:<3} "
-                                          f"IBI={_f(g['median_ibi_s'], 2):>5}s  from {frm}")
+            self.groups_box.insert("end", f"{g['label']:<4}{_f(g.get('beat_train_bpm')):>5} BPM n={g['n_patches']:<3}"
+                                          f"{rel.get(g.get('relation'), '-'):<7}R={_f(pl.get('R'), 2):>4} "
+                                          f"d={_f(pl.get('delay_s'), 2):>5}s  from {frm}")
             if not g["assigned"]:
                 self.groups_box.itemconfig("end", foreground="gray")
+            elif g.get("relation") == "not_locked":
+                self.groups_box.itemconfig("end", foreground="#b00020")
         self.pairs_box.delete(0, "end")
-        self.pairs = sorted(s["pairs_final"], key=lambda p: (not p["merge_suggested"], -(p["lag_aligned_shape_correlation"] or -9)))
+        self.pairs = sorted(s["pairs_final"], key=lambda p: (not p["merge_suggested"], -(p["phase_lock_R"] or -9)))
         for p in self.pairs:
-            self.pairs_box.insert("end", f"{p['a']:>3}-{p['b']:<3} {_f(p['bpm_a'])}/{_f(p['bpm_b'])} BPM  "
-                                         f"ratio x{p['harmonic_ratio'] or 0:g}  lag {_f(p['best_lag_s'], 2)}s  "
-                                         f"shape {_f(p['lag_aligned_shape_correlation'], 2)}")
+            fol = "-" if p["follow_fraction"] is None else f"{100 * p['follow_fraction']:.0f}%"
+            self.pairs_box.insert("end", f"{p['a']:>3}-{p['b']:<3} {_f(p['beat_train_bpm_a'])}/{_f(p['beat_train_bpm_b'])} BPM  "
+                                         f"lock R {_f(p['phase_lock_R'], 2)} (crit {_f(p['phase_lock_R_crit'], 2)})  "
+                                         f"delay {_f(p['delay_s'], 2)}s  follows {fol}")
             if p["merge_suggested"]:
                 self.pairs_box.itemconfig("end", background="#fff2b3")
         self.merge_label.config(text="manual merges (auto labels): " + (", ".join("+".join(m) for m in self.merges) or "none"))

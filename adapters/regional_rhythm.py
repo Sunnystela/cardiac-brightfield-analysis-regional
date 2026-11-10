@@ -33,8 +33,10 @@ from ._engine import engine
 MIN_GROUP_PATCHES = 3            # smaller clusters are reported as "unassigned" (still mergeable by hand)
 MAX_LAG_S = 1.0                  # same default as patch_phase_consensus_diagnostic / region_pair_lag_diagnostic
 COVERAGE_WINDOW_S = 5.0          # diagnostic-only edge field (temporal_coverage_overlap); not part of the distance
-SUGGEST_MIN_PERIOD_SIMILARITY = 0.90   # merge suggestion: harmonic-aware period similarity of the two groups
-SUGGEST_MIN_SHAPE_CORRELATION = 0.80   # merge suggestion: lag-aligned correlation of the two group mean waveforms
+LOCK_MIN_R = 0.5                 # phase locking: Rayleigh-significant (p<0.01) AND resultant length >= this
+MIN_BEATS_FOR_PHASE = 5          # fewer phase samples -> relation "insufficient_beats"
+FOLLOW_TOLERANCE_FRACTION = 0.25 # a reference beat is "followed" if a group beat lies within this x median IBI
+                                 # of (reference beat + the group's mean delay)
 ATTACH_LEFTOVERS = True          # stage 2 of grouping, see RegionalRhythm._attach_leftovers
 
 
@@ -80,6 +82,41 @@ def rank_weights(confidence_by_patch: dict, patch_ids: list) -> dict:
     return {p: float(r / len(ids)) for p, r in zip(ids, ranks)}
 
 
+def phase_lock(reference_beats, beats) -> dict | None:
+    """Does a beat train keep a fixed timing relation to a reference beat train?
+
+    Each beat gets a phase in [0, 1) inside the reference cycle that contains it (cycles longer than
+    1.5x the reference median IBI are skipped, so a beat the REFERENCE missed does not distort phases).
+    Phases are summarised as a circular mean: R = resultant length (1 = always the same delay, ~0 =
+    unrelated), significance by the Rayleigh test (R_crit = sqrt(-ln(0.01)/n)). Locking is independent
+    of how many beats the group drops, which a rate (BPM) comparison is not.
+    Returns None when either train is too short."""
+    ref = np.sort(np.asarray(reference_beats, float))
+    ev = np.sort(np.asarray(beats, float))
+    if len(ref) < 3 or len(ev) < MIN_BEATS_FOR_PHASE:
+        return None
+    med = float(np.median(np.diff(ref)))
+    ph = []
+    for x in ev:
+        k = int(np.searchsorted(ref, x, side="right")) - 1
+        if 0 <= k < len(ref) - 1 and (ref[k + 1] - ref[k]) <= 1.5 * med:
+            ph.append((x - ref[k]) / (ref[k + 1] - ref[k]))
+    n = len(ph)
+    if n < MIN_BEATS_FOR_PHASE:
+        return None
+    z = np.exp(2j * np.pi * np.asarray(ph)).mean()
+    R = float(abs(z))
+    mean_phase = float((np.angle(z) / (2 * np.pi)) % 1.0)
+    signed = mean_phase - 1.0 if mean_phase > 0.5 else mean_phase   # (-0.5, 0.5]: negative = slightly before
+    delay = signed * med
+    tol = FOLLOW_TOLERANCE_FRACTION * med
+    followed = float(np.mean([np.min(np.abs(ev - (r + delay))) <= tol for r in ref]))
+    r_crit = float(np.sqrt(-np.log(0.01) / n))
+    return {"R": R, "R_crit_p01": r_crit, "locked": bool(R > r_crit and R >= LOCK_MIN_R), "n_phases": n,
+            "mean_phase_cycles": signed, "delay_s": delay, "reference_median_ibi_s": med,
+            "follow_fraction": followed, "beats_per_reference_beat": len(ev) / len(ref)}
+
+
 @dataclass
 class Group:
     label: str                      # "G1", "G2", ... (size order) or "U1", ... for unassigned clusters
@@ -88,6 +125,7 @@ class Group:
     merged_from: list = field(default_factory=list)
     metrics: dict = field(default_factory=dict)
     mean_waveform: np.ndarray | None = None
+    beat_train: list = field(default_factory=list)
 
 
 class RegionalRhythm:
@@ -149,28 +187,25 @@ class RegionalRhythm:
         self.graph = hat.build_robust_patch_timing_graph(
             ids, self.waveforms, self.pooled, self.own_period, self.dt,
             self.coincidence_tolerance_s, MAX_LAG_S, self.duration_s, COVERAGE_WINDOW_S)
-        clusters, info = atc.cluster_patches_by_robust_timing_similarity_hierarchical(ids, self.graph, self.rank_w)
+        # Grouping uses the UNWEIGHTED timing distance (uniform weight 1.0 -> engine distance = 1 - similarity).
+        # Multiplying by confidence (engine default) compresses within- vs between-region contrast: on the
+        # P38_D16 sample, within-region 0.12-0.19 / between 0.35-0.43 became 0.39-0.57 / 0.59-0.68, and the
+        # regions collapsed into one cluster. Confidence measures motion observability, not beat timing.
+        clusters, info = atc.cluster_patches_by_robust_timing_similarity_hierarchical(ids, self.graph, {p: 1.0 for p in ids})
         self.core_clusters = [sorted(c) for c in clusters]
-        self.distance_matrix = info.pop("distance_matrix")
+        self.raw_distance = info.pop("distance_matrix")
+        self.distance_matrix = self.raw_distance
         self.cut_info = info
-        n = len(ids)
-        self.raw_distance = np.array([[0.0 if i == j else hat.robust_pairwise_timing_distance(hat.get_edge(self.graph, ids[i], ids[j]))
-                                       for j in range(n)] for i in range(n)])
         self.auto_clusters, self.attached = self._attach_leftovers(self.core_clusters) if ATTACH_LEFTOVERS else (self.core_clusters, {})
         dens, dinfo = atc.cluster_patches_by_density(sorted(ids), self.raw_distance)
         self.density = {"distance": "unweighted robust timing distance", "clusters": [[_key(p) for p in c] for c in dens],
                         **dinfo, "rand_index_vs_final_auto": _rand_index(self.auto_clusters, dens, ids)}
 
     def _attach_leftovers(self, core: list) -> tuple[list, dict]:
-        """Stage 2: patches left in clusters smaller than MIN_GROUP_PATCHES join the core group they
-        are closest to by the UNWEIGHTED robust distance, but only if that distance is within the
-        group's own spread (the largest of its members' mean distances to the rest of the group --
-        i.e. the patch would not be the group's most distant member).
-
-        Why: the engine's weighted distance is 1 - similarity * sqrt(w_a * w_b), so a low-confidence
-        patch is pushed toward distance 1 from everything even when its timing matches a group.
-        Stage 1 keeps the grouping anchored on confident patches; stage 2 decides membership of the
-        rest on timing evidence alone. Attached patches are reported separately."""
+        """Stage 2: patches left in clusters smaller than MIN_GROUP_PATCHES join the group they are
+        closest to (mean unweighted distance), but only if that distance is within the group's own
+        spread (the largest of its members' mean distances to the rest of the group -- i.e. the patch
+        would not be the group's most distant member). Attached patches are reported separately."""
         idx = {p: i for i, p in enumerate(self.reliable)}
         D = self.raw_distance
         groups = [list(c) for c in core if len(c) >= MIN_GROUP_PATCHES]
@@ -277,15 +312,70 @@ class RegionalRhythm:
         gs = [Group("", c, len(c) >= MIN_GROUP_PATCHES) for c in self.auto_clusters]
         return _assign_labels(gs)
 
+    def beat_train(self, waveform) -> list[float]:
+        """Beat times of a group: the engine's own event detector run on the group mean waveform
+        (positive = outward radial events). Averaging the members first lets a group show beats that
+        single noisy patches miss."""
+        if waveform is None:
+            return []
+        diag = engine("patch_phase_consensus_diagnostic")
+        f = diag.per_patch_events_and_features((-1, -1), waveform, self.dt, self.frame_step, self.fps, self.config)
+        return sorted(e.event_time for e in f["positive_events"])
+
     def _label_and_measure(self, gs: list[Group], rla) -> list[Group]:
         gs = _assign_labels(gs)
         for g in gs:
             g.metrics = self.group_metrics(g.patch_ids)
             g.mean_waveform = rla.region_mean_waveform(self.waveforms, g.patch_ids)
+            g.beat_train = self.beat_train(g.mean_waveform)
+            ibi = np.diff(g.beat_train)
+            g.metrics.update({
+                "beat_train_n": len(g.beat_train),
+                "beat_train_bpm": float(60.0 / np.median(ibi)) if len(ibi) and np.median(ibi) > 0 else None,
+                "beat_train_ibi_cv": float(np.std(ibi, ddof=1) / np.mean(ibi)) if len(ibi) > 1 and np.mean(ibi) > 0 else None,
+            })
+        self._relate_to_reference(gs)
         return gs
 
+    def reference(self) -> dict | None:
+        """The reference RHYTHM: beat train of the AUTO group (>= MIN_GROUP_PATCHES patches) whose train is the
+        most regular (lowest IBI CV, >= MIN_BEATS_FOR_PHASE beats). Fixed per observation, so manual merges
+        never change what the other groups are compared against."""
+        if not hasattr(self, "_reference"):
+            rla = engine("cardio_organoid.functional.regional_lag_diagnostics")
+            best = None
+            for g in self.auto_groups_raw():
+                if not g.assigned:
+                    continue
+                train = self.beat_train(rla.region_mean_waveform(self.waveforms, g.patch_ids))
+                ibi = np.diff(train)
+                if len(train) < MIN_BEATS_FOR_PHASE or np.mean(ibi) <= 0:
+                    continue
+                cv = float(np.std(ibi, ddof=1) / np.mean(ibi))
+                if best is None or cv < best["ibi_cv"]:
+                    best = {"auto_label": g.label, "patch_ids": set(g.patch_ids), "beat_train": train, "ibi_cv": cv,
+                            "bpm": float(60.0 / np.median(ibi))}
+            self._reference = best
+        return self._reference
+
+    def _relate_to_reference(self, gs: list[Group]) -> None:
+        """Phase relation of every group to the reference rhythm: reference (group contains the reference
+        auto group), locked (same rhythm, possibly delayed / dropping beats), not_locked (independent rhythm
+        or unusable timing), insufficient_beats."""
+        ref = self.reference()
+        for g in gs:
+            if ref is None:
+                g.metrics.update(reference_group=None, relation="no_reference", phase_lock=None)
+            elif ref["patch_ids"] <= set(g.patch_ids):
+                g.metrics.update(reference_group=ref["auto_label"], relation="reference", phase_lock=None)
+            else:
+                pl = phase_lock(ref["beat_train"], g.beat_train)
+                rel = "insufficient_beats" if pl is None else ("locked" if pl["locked"] else "not_locked")
+                g.metrics.update(reference_group=ref["auto_label"], relation=rel, phase_lock=pl)
+
     def pair_comparisons(self, gs: list[Group]) -> list[dict]:
-        """Every pair of groups (assigned or not): rate relation, timing offset, lag-aligned shape match."""
+        """Every pair of groups. Merge is SUGGESTED when the two beat trains are phase-locked (fixed delay;
+        dropped beats allowed). Rate relation and lag-aligned waveform shape are reported as context."""
         hat = engine("cardio_organoid.functional.harmonic_aware_timing")
         rla = engine("cardio_organoid.functional.regional_lag_diagnostics")
         out = []
@@ -300,14 +390,19 @@ class RegionalRhythm:
                 lag = (rla.region_pair_lag_diagnostic(a.mean_waveform, b.mean_waveform, self.dt, max_lag_s=max_lag)
                        if a.mean_waveform is not None and b.mean_waveform is not None else None)
                 cc = (lag or {}).get("cross_correlation") or {}
-                shape = cc.get("best_correlation")
-                suggest = bool(ps["similarity"] is not None and ps["similarity"] >= SUGGEST_MIN_PERIOD_SIMILARITY
-                               and ps["best_ratio"] == 1.0 and shape is not None and shape >= SUGGEST_MIN_SHAPE_CORRELATION)
+                # phase locking measured against the more regular of the two trains
+                cv = lambda g: g.metrics.get("beat_train_ibi_cv") if g.metrics.get("beat_train_ibi_cv") is not None else 9e9
+                base, other = (a, b) if cv(a) <= cv(b) else (b, a)
+                pl = phase_lock(base.beat_train, other.beat_train)
                 out.append({"a": a.label, "b": b.label, "bpm_a": a.metrics.get("bpm"), "bpm_b": b.metrics.get("bpm"),
+                            "beat_train_bpm_a": a.metrics.get("beat_train_bpm"), "beat_train_bpm_b": b.metrics.get("beat_train_bpm"),
+                            "phase_base": base.label, "phase_lock_R": pl["R"] if pl else None,
+                            "phase_lock_R_crit": pl["R_crit_p01"] if pl else None,
+                            "delay_s": (pl["delay_s"] if base is a else -pl["delay_s"]) if pl else None,
+                            "follow_fraction": pl["follow_fraction"] if pl else None,
                             "period_similarity": ps["similarity"], "harmonic_ratio": ps["best_ratio"],
-                            "zero_lag_correlation": (lag or {}).get("zero_lag_correlation"),
-                            "best_lag_s": cc.get("best_lag_s"), "lag_aligned_shape_correlation": shape,
-                            "merge_suggested": suggest})
+                            "lag_aligned_shape_correlation": cc.get("best_correlation"),
+                            "merge_suggested": bool(pl and pl["locked"])})
         return out
 
     # ---------------------------------------------------------------- output
@@ -319,22 +414,34 @@ class RegionalRhythm:
             status = "NO_RELIABLE_PATCHES"
         elif not assigned:
             status = "NO_GROUP_WITH_MIN_PATCHES"
+        elif len(assigned) == 1:
+            status = "SINGLE_GROUP"
+        elif any(g.metrics["relation"] == "not_locked" for g in assigned):
+            status = "INDEPENDENT_RHYTHM_PRESENT"
+        elif any(g.metrics["relation"] in ("insufficient_beats", "no_reference") for g in assigned):
+            status = "MULTIPLE_GROUPS_UNRESOLVED"
         else:
-            status = "MULTIPLE_RHYTHMS" if len(assigned) > 1 else "SINGLE_RHYTHM"
+            status = "MULTIPLE_GROUPS_SAME_RHYTHM"
         return {
             "observation_id": self.cache["observation_id"], "status": status,
             "created_utc": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
             "inputs": {k: str(v) for k, v in self.cache.items()},
             "parameters": {"min_group_patches": MIN_GROUP_PATCHES, "max_lag_s": MAX_LAG_S,
                            "coverage_window_s": COVERAGE_WINDOW_S, "coincidence_tolerance_s": self.coincidence_tolerance_s,
-                           "grouping_weights": "stage 1: rank of final_provisional_confidence among reliable patches",
+                           "grouping_distance": "stage 1: unweighted robust timing distance (no confidence weighting)",
+                           "reference_rule": "AUTO group (>= min patches) whose mean-waveform beat train has the lowest "
+                                             "IBI CV; fixed per observation (unchanged by manual merges)",
+                           "lock_rule": f"Rayleigh R > sqrt(-ln(0.01)/n) and R >= {LOCK_MIN_R}",
                            "attach_leftovers": ATTACH_LEFTOVERS,
                            "attach_rule": "stage 2: unweighted mean distance to group <= max of members' own mean distance",
                            "bpm_weights": "final_provisional_confidence (official); rank fallback if all <= 0",
-                           "suggest_min_period_similarity": SUGGEST_MIN_PERIOD_SIMILARITY,
-                           "suggest_min_shape_correlation": SUGGEST_MIN_SHAPE_CORRELATION},
+                           "lock_min_r": LOCK_MIN_R, "min_beats_for_phase": MIN_BEATS_FOR_PHASE,
+                           "follow_tolerance_fraction": FOLLOW_TOLERANCE_FRACTION,
+                           "beat_train": "positive events detected on the group mean waveform (engine detector)"},
             "n_patches": len(self.patch_ids), "n_reliable": len(self.reliable),
             "merges": merges or [],
+            "reference": ({k: (sorted(_key(p) for p in v) if k == "patch_ids" else v) for k, v in self.reference().items()}
+                          if self.reference() else None),
             "groups_auto": [_group_json(g) for g in auto],
             "groups_final": [_group_json(g) for g in final],
             "pairs_final": self.pair_comparisons(final),
@@ -371,7 +478,8 @@ def _assign_labels(gs: list[Group]) -> list[Group]:
 
 def _group_json(g: Group) -> dict:
     return {"label": g.label, "assigned": g.assigned, "merged_from": g.merged_from,
-            "patch_ids": [_key(p) for p in g.patch_ids], **_jsonable(g.metrics)}
+            "patch_ids": [_key(p) for p in g.patch_ids], **_jsonable(g.metrics),
+            "beat_train_s": [round(t, 4) for t in g.beat_train]}
 
 
 def _jsonable(x):
@@ -419,7 +527,9 @@ def write_merge_file(path: Path, merges: list[list[str]], note: str = "") -> Pat
     return path
 
 
-GROUP_CSV_FIELDS = ["observation_id", "label", "assigned", "merged_from", "n_patches", "fraction_of_reliable", "bpm",
+GROUP_CSV_FIELDS = ["observation_id", "label", "assigned", "merged_from", "n_patches", "fraction_of_reliable",
+                    "relation", "reference_group", "phase_lock_R", "phase_lock_R_crit", "delay_s", "follow_fraction",
+                    "beat_train_n", "beat_train_bpm", "beat_train_ibi_cv", "bpm",
                     "bpm_positive", "bpm_negative", "fundamental_bpm", "median_own_bpm", "median_ibi_s", "ibi_cv",
                     "consensus_beat_count", "estimator_agreement", "autocorrelation_bpm", "spectral_bpm",
                     "mean_confidence", "weight_fallback_rank", "n_spatial_components", "patch_ids"]
@@ -433,7 +543,10 @@ def write_outputs(summary: dict, out_dir: Path) -> dict:
         w = csv.DictWriter(f, fieldnames=GROUP_CSV_FIELDS, extrasaction="ignore")
         w.writeheader()
         for g in summary["groups_final"]:
+            pl = g.get("phase_lock") or {}
             w.writerow({**g, "observation_id": summary["observation_id"], "merged_from": "+".join(g["merged_from"]),
+                        "phase_lock_R": pl.get("R"), "phase_lock_R_crit": pl.get("R_crit_p01"),
+                        "delay_s": pl.get("delay_s"), "follow_fraction": pl.get("follow_fraction"),
                         "patch_ids": " ".join(g["patch_ids"])})
     return {"json": str(out_dir / "regional_rhythm.json"), "csv": str(out_dir / "regional_groups.csv")}
 
@@ -441,8 +554,15 @@ def write_outputs(summary: dict, out_dir: Path) -> dict:
 def row_columns(summary: dict, out_dir: Path | None = None) -> dict:
     """Columns added to an analysis row (the official `bpm` is never touched)."""
     assigned = [g for g in summary["groups_final"] if g["assigned"]]
+    ref = summary.get("reference") or {}
     return {"regional_status": summary["status"], "n_rhythm_groups": len(assigned),
+            "n_independent_groups": sum(g.get("relation") == "not_locked" for g in assigned),
+            "regional_reference_group": ref.get("auto_label"),
+            "regional_reference_beat_train_bpm": ref.get("bpm"),
+            "regional_reference_beat_train_cv": ref.get("ibi_cv"),
             "regional_bpms": [g["bpm"] for g in assigned],
+            "regional_beat_train_bpms": [g.get("beat_train_bpm") for g in assigned],
+            "regional_relations": [g.get("relation") for g in assigned],
             "regional_group_n_patches": [g["n_patches"] for g in assigned],
             "regional_group_fractions": [g["fraction_of_reliable"] for g in assigned],
             "regional_n_unassigned": sum(g["n_patches"] for g in summary["groups_final"] if not g["assigned"]),

@@ -123,21 +123,29 @@ def render_map(rr, summary: dict, out_path: Path, frame_bgr=None, mask=None) -> 
         pts = [cells[tuple(int(x) for x in k.split("_"))] for k in g["patch_ids"]]
         cx = np.mean([(b[0] + b[2]) / 2 for b in pts])
         cy = np.mean([(b[1] + b[3]) / 2 for b in pts])
-        bpm = g["bpm"]
-        axes[0].text(cx, cy, f"{g['label']}\n{bpm:.1f} BPM" if bpm else g["label"], ha="center", va="center",
-                     fontsize=10, weight="bold", color="black",
-                     bbox=dict(boxstyle="round,pad=0.2", fc="white", ec=colors[g["label"]], alpha=0.85))
-    axes[0].set_title("rhythm groups (period + beat timing)\nhatched = unassigned, o = attached in stage 2, dotted = not reliable", fontsize=9)
+        tb = g.get("beat_train_bpm")
+        tag = {"reference": "REF", "locked": "locked", "not_locked": "INDEPENDENT"}.get(g.get("relation"), "?")
+        axes[0].text(cx, cy, f"{g['label']} {tb:.1f}\n{tag}" if tb else g["label"], ha="center", va="center",
+                     fontsize=9, weight="bold", color="black",
+                     bbox=dict(boxstyle="round,pad=0.2", fc="white", ec=colors[g["label"]], lw=2, alpha=0.85))
+    axes[0].set_title("timing groups (unweighted period + beat-timing distance); label = group beat-train BPM\n"
+                      "REF = most regular group, locked = same rhythm (fixed delay, may drop beats)\n"
+                      "hatched = unassigned, o = attached in stage 2, dotted = not reliable", fontsize=8)
     sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=matplotlib.colors.Normalize(vmin, vmax))
     fig.colorbar(sm, ax=axes[1], fraction=0.046, pad=0.02, label="patch own BPM")
     axes[1].set_title("per-patch own BPM (median of IBI+/IBI-/spectral/autocorr candidates)", fontsize=9)
 
     ax = axes[2]
     ax.axis("off")
-    rows = [[g["label"], g["n_patches"], _f(g["bpm"]), _f(g["fundamental_bpm"]), _f(g["median_ibi_s"], 2),
-             _f(g["ibi_cv"], 2), _f(g["estimator_agreement"], 2), "+".join(g["merged_from"])]
-            for g in summary["groups_final"]]
-    tab = ax.table(cellText=rows, colLabels=["group", "n", "BPM", "fund.\nBPM", "med IBI\n(s)", "IBI CV", "est.\nagree", "from"],
+    rel_short = {"reference": "REF", "locked": "locked", "not_locked": "indep.", "insufficient_beats": "few beats"}
+    rows = []
+    for g in summary["groups_final"]:
+        pl = g.get("phase_lock") or {}
+        rows.append([g["label"], g["n_patches"], _f(g.get("beat_train_bpm")), _f(g.get("beat_train_ibi_cv"), 2),
+                     _f(g["bpm"]), rel_short.get(g.get("relation"), "-"), _f(pl.get("R"), 2), _f(pl.get("delay_s"), 2),
+                     _pct(pl.get("follow_fraction")), "+".join(g["merged_from"])])
+    tab = ax.table(cellText=rows, colLabels=["group", "n", "train\nBPM", "train\nCV", "official-\nrule BPM", "vs REF",
+                                             "lock R", "delay\n(s)", "follows\nREF", "from"],
                    loc="upper center", cellLoc="center")
     tab.auto_set_font_size(False)
     tab.set_fontsize(8)
@@ -145,7 +153,7 @@ def render_map(rr, summary: dict, out_path: Path, frame_bgr=None, mask=None) -> 
     for (r, c), cell in tab.get_celld().items():
         if r > 0 and c == 0:
             cell.set_facecolor((*colors.get(rows[r - 1][0], GREY), 0.55))
-    ax.set_title(f"official bpm is unchanged; groups: {summary['status']}", fontsize=9)
+    ax.set_title(f"{summary['status']}\ntrain = beats on group mean waveform\n(official bpm column unchanged)", fontsize=9)
     fig.legend(handles=[Patch(fc=colors[l], label=l) for l in labels if l.startswith("G")],
                loc="lower left", ncol=10, fontsize=8, frameon=False)
     fig.suptitle(f"{summary['observation_id']} - regional rhythm groups "
@@ -165,18 +173,28 @@ def render_traces(rr, summary: dict, out_path: Path) -> str:
     colors = group_colors([g["label"] for g in groups])
     shown = [g for g in groups if g["assigned"]] or groups[:1]
     n = len(shown)
-    fig, axes = plt.subplots(n + 1, 1, figsize=(14, 2.0 * n + 4.5), sharex=True,
+    fig, axes = plt.subplots(n + 1, 1, figsize=(15, 1.7 * n + 4.5), sharex=True,
                              gridspec_kw={"height_ratios": [1] * n + [max(2.5, 0.09 * len(rr.reliable))]})
     axes = np.atleast_1d(axes)
     t = np.arange(len(next(iter(rr.waveforms.values())))) * rr.dt
     rla = engine("cardio_organoid.functional.regional_lag_diagnostics")
+    ref = summary.get("reference")
     for ax, g in zip(axes[:n], shown):
         pids = [tuple(int(x) for x in k.split("_")) for k in g["patch_ids"]]
         w = rla.region_mean_waveform(rr.waveforms, pids)
+        if ref is not None:
+            for tb in ref["beat_train"]:
+                ax.axvline(tb, color="0.75", lw=0.6, ls="--", zorder=0)
         ax.plot(t, w, color=colors[g["label"]], lw=1.0)
-        ax.set_ylabel(f"{g['label']}\n{_f(g['bpm'])} BPM", rotation=0, ha="right", va="center", fontsize=9)
+        bt = np.asarray(g.get("beat_train_s") or [])
+        if bt.size:
+            ax.plot(bt, np.interp(bt, t, w), "v", color="black", ms=4)
+        pl = g.get("phase_lock") or {}
+        info = ("REF" if g.get("relation") == "reference" else
+                f"{g.get('relation')}\nR={_f(pl.get('R'), 2)} d={_f(pl.get('delay_s'), 2)}s\nfollows {_pct(pl.get('follow_fraction'))}")
+        ax.set_ylabel(f"{g['label']} {_f(g.get('beat_train_bpm'))}\n{info}", rotation=0, ha="right", va="center", fontsize=8)
         ax.tick_params(labelsize=7)
-    axes[0].set_title("group mean radial waveform (px/pair)", fontsize=9)
+    axes[0].set_title("group mean radial waveform (px/pair); v = group beats; grey dashed = reference group beats", fontsize=9)
     ax = axes[-1]
     y, yt, yl = 0, [], []
     for g in groups:
@@ -241,7 +259,7 @@ def render_clustering(rr, summary: dict, out_path: Path) -> str:
         ax.text(1, max(h), "not searched (first half)", fontsize=7, va="top", color="0.4")
     ax.set_xlabel("merge #", fontsize=8)
     ax.set_ylabel("average-linkage height", fontsize=8)
-    ax.set_title("stage 1: confidence-rank weighted merges, cut at largest relative jump", fontsize=9)
+    ax.set_title("stage 1: unweighted average-linkage merges, cut at largest relative jump", fontsize=9)
     ax.tick_params(labelsize=7)
 
     ax = fig.add_subplot(gs[1, 1])
@@ -256,28 +274,36 @@ def render_clustering(rr, summary: dict, out_path: Path) -> str:
         ax.set_xticks(list(xs))
         ax.set_xticklabels([f"{k}\n->{a['group_final']}" for k, a in att], fontsize=6)
         ax.legend(fontsize=7, loc="lower right")
+    else:
+        ax.axis("off")
+        ax.text(0.5, 0.5, "no leftover patch was within an existing group's own distance range\n"
+                "(they stay as unassigned U* groups; their relation to the reference is in the map table)",
+                ha="center", va="center", fontsize=8, transform=ax.transAxes)
     ax.set_title(f"stage 2: {len(att)} leftover patches attached by timing distance; {len(left)} stay unassigned", fontsize=9)
     ax.set_ylabel("mean distance to group", fontsize=8)
     ax.tick_params(labelsize=7)
 
     ax = fig.add_subplot(gs[:, 2])
     ax.axis("off")
-    pairs = sorted(summary["pairs_final"], key=lambda p: (not p["merge_suggested"], -(p["lag_aligned_shape_correlation"] or -9)))[:18]
-    rows = [[f"{p['a']}-{p['b']}", f"{_f(p['bpm_a'])}/{_f(p['bpm_b'])}", _f(p["period_similarity"], 2),
-             f"x{p['harmonic_ratio']:g}" if p["harmonic_ratio"] else "-", _f(p["best_lag_s"], 2),
+    assigned = {g["label"] for g in groups if g["assigned"]}
+    pairs = [p for p in summary["pairs_final"] if p["a"] in assigned and p["b"] in assigned]
+    pairs = sorted(pairs, key=lambda p: (not p["merge_suggested"], -(p["phase_lock_R"] or -9)))[:18]
+    rows = [[f"{p['a']}-{p['b']}", f"{_f(p['beat_train_bpm_a'])}/{_f(p['beat_train_bpm_b'])}", p["phase_base"],
+             _f(p["phase_lock_R"], 2), _f(p["phase_lock_R_crit"], 2), _f(p["delay_s"], 2), _pct(p["follow_fraction"]),
              _f(p["lag_aligned_shape_correlation"], 2), "YES" if p["merge_suggested"] else ""] for p in pairs]
     if rows:
-        tab = ax.table(cellText=rows, colLabels=["pair", "BPM", "period\nsim", "ratio", "lag (s)", "shape\ncorr", "suggest\nmerge"],
+        tab = ax.table(cellText=rows, colLabels=["pair", "train BPM", "phase\nbase", "lock R", "R crit\n(p<.01)",
+                                                 "delay\n(s)", "follows\nbase", "shape\ncorr", "suggest\nmerge"],
                        loc="upper center", cellLoc="center")
         tab.auto_set_font_size(False)
         tab.set_fontsize(7.5)
         tab.scale(1, 1.3)
         for r, p in enumerate(pairs, start=1):
             if p["merge_suggested"]:
-                for c in range(7):
+                for c in range(9):
                     tab[r, c].set_facecolor("#fff2b3")
-    ax.set_title("group pairs: rate relation, timing offset, lag-aligned shape match\n"
-                 "(suggestion only - merging is a manual decision)", fontsize=9)
+    ax.set_title("group pairs: phase locking of beat trains (suggest merge = locked: same rhythm,\n"
+                 "fixed delay, dropped beats allowed). Suggestion only - merging is a manual decision", fontsize=9)
     fig.suptitle(f"{summary['observation_id']} - how the regional groups were formed", fontsize=11)
     fig.tight_layout(rect=(0, 0, 1, 0.96))
     fig.savefig(out_path, dpi=120)
@@ -295,3 +321,7 @@ def render_all(rr, summary: dict, out_dir: Path, frame_bgr=None, mask=None) -> d
 
 def _f(v, nd=1):
     return "-" if v is None else f"{v:.{nd}f}"
+
+
+def _pct(v):
+    return "-" if v is None else f"{100 * v:.0f}%"
